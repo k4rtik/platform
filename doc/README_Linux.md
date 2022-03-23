@@ -18,7 +18,7 @@ sudo snap install coq-prover
 
 In case you don't have snap installed yet, please refer to [installing-snapd](https://snapcraft.io/docs/installing-snapd)
 
-The snap URL is https://snapcraft.io/coq-prover.
+The snap URL is <https://snapcraft.io/coq-prover>.
 
 This install method is maintained by Enrico Tassi.
 

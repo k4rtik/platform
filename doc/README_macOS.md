@@ -12,7 +12,7 @@ This method is intended for beginners.
 
 In case you want to use the fast path:
 
-- Download the DMG package from https://github.com/coq/platform/releases (click on "Assets" at the end of a release section).
+- Download the DMG package from <https://github.com/coq/platform/releases> (click on "Assets" at the end of a release section).
 - Open the downloaded DMG package with a double click.
 - Drag and drop the "Coq_Platform_2022.01.0.app" icon on the link to the "Applications" folder.
 - CoqIDE appears under `/Applications` in Finder and in Launcher.
@@ -71,15 +71,15 @@ If you already have MacPorts or Homebrew installed, we recommend to keep what yo
 
 ## Installing
 
-- For MacPorts installation follow the instructions at (https://www.macports.org/install.php) - that is download the installer package matching our OS version and double click on the downloaded package.
+- For MacPorts installation follow the instructions at (<https://www.macports.org/install.php>) - that is download the installer package matching our OS version and double click on the downloaded package.
 
-- For homebrew installation instructions see (https://brew.sh/index) - we followed the recommended approach
+- For homebrew installation instructions see (<https://brew.sh/index>) - we followed the recommended approach
 `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` using the default location - see the next section on a discussion if this is safe.
 
 ## Is Homebrew safe?
 
 There is an ongoing dispute if Homebrew's strategy of making the `/usr/local` folder writable to the current user is a good idea.
-See e.g. (https://discourse.brew.sh/t/security-issues-using-Homebrew-malicious-insertion/3379) or various comments in (https://gist.github.com/irazasyed/7732946).
+See e.g. (<https://discourse.brew.sh/t/security-issues-using-Homebrew-malicious-insertion/3379>) or various comments in (<https://gist.github.com/irazasyed/7732946>).
 
 A short summary of the dispute:
 - The Homebrew authors say that it is safer to make `/usr/local` writable to the current user and run installers without elevated rights, because this way an installer can only mess up `/usr/local` - which is not part of the core system - while an installer run with sudo rights can mess up any file in the system. This is a valid argument.
@@ -109,7 +109,7 @@ The bottom line is: there is no entirely safe way to install 100s of open source
   - `/usr/local/Homebrew`
   - `/usr/local/Frameworks`
 
-- In case any of the above folders exists and is not recursively writable by the current user, you need to run `sudo chown -R ${USER}:admin /usr/local/*` or alternatively the same for each of the above folders **before you install Homebrew**. See e.g. (https://github.com/Homebrew/brew/issues/2098) or (https://gist.github.com/irazasyed/7732946). Please read [Is Homebrew safe?](#is-homebrew-safe) above before you do this.
+- In case any of the above folders exists and is not recursively writable by the current user, you need to run `sudo chown -R ${USER}:admin /usr/local/*` or alternatively the same for each of the above folders **before you install Homebrew**. See e.g. (<https://github.com/Homebrew/brew/issues/2098>) or (<https://gist.github.com/irazasyed/7732946>). Please read [Is Homebrew safe?](#is-homebrew-safe) above before you do this.
 
 - In case you didn't issue the above command before installing Homebrew it might happen that you ended up with a broken pkg-config - a tool used to find libraries - so that installed libraries are not registered with pkg-config and not found. Fixing pkg-config after installing libraries doesn't help - the libraries won't register again with pkg-config. The only easy fix for this is to issue `brew uninstall $(brew list)`. Of cause this will uninstall all packages you might have installed. You can create a list with `brew list` before and then reinstall this list with `brew install paste mylist here`. If your main interest is the Coq Platform there is no issue - the setup script will install everything it needs.
 

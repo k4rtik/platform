@@ -10,10 +10,8 @@
 
 ###################### CHECK IF WE HAVE A COMPILER #####################
 
-if [[ "$OSTYPE" == linux* ]]
-then
-	if ! command -v gcc &> /dev/null || ! command -v g++ &> /dev/null || ! command -v make &> /dev/null
-	then
+if [[ "$OSTYPE" == linux* ]]; then
+	if ! command -v gcc &>/dev/null || ! command -v g++ &>/dev/null || ! command -v make &>/dev/null; then
 		cat <<-EOH
 			=========================== Build tools required! ===========================
 			This script requires build tools (make, a C compiler) to be installed.
@@ -30,15 +28,13 @@ then
 			This script will exit now.
 			Please restart the script after you installed the build tools.
 			=========================== Build tools required! ===========================
-			EOH
-	return 1
+		EOH
+		return 1
 	fi
 
-elif [[ "$OSTYPE" == darwin* ]]
-then
+elif [[ "$OSTYPE" == darwin* ]]; then
 
-	if ! command -v gcc &> /dev/null || ! command -v g++ &> /dev/null || ! command -v make &> /dev/null
-	then
+	if ! command -v gcc &>/dev/null || ! command -v g++ &>/dev/null || ! command -v make &>/dev/null; then
 		cat <<-EOH
 			=========================== Build tools required! ===========================
 			This script requires build tools (make, a C compiler) to be installed.
@@ -53,7 +49,7 @@ then
 			This script will exit now.
 			Please restart the script after you installed the build tools.
 			=========================== Build tools required! ===========================
-			EOH
+		EOH
 		return 1
 	fi
 

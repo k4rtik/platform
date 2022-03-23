@@ -35,10 +35,9 @@ packages="$(opam list --installed-roots --short --columns=name | grep "${pattern
 
 ##### Get the source for each package #####
 
-for package in ${packages}
-do
-  # get installed version of package (otherwise opam source gives the latest)
-  packagefull=$(opam list --installed-roots --short --columns=name,version ${package} | sed 's/ /./')
-  echo "Extracting sources for ${packagefull}"
-  opam source --dir=source-statistics/${package} ${packagefull}
+for package in ${packages}; do
+	# get installed version of package (otherwise opam source gives the latest)
+	packagefull=$(opam list --installed-roots --short --columns=name,version ${package} | sed 's/ /./')
+	echo "Extracting sources for ${packagefull}"
+	opam source --dir=source-statistics/${package} ${packagefull}
 done

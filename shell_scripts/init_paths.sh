@@ -13,9 +13,8 @@
 # The folder of the main script (*not* this script!)
 SCRIPTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd)"
 
-if [[ "$OSTYPE" == cygwin ]]
-then
-  OPAMPACKAGES=$(cygpath -ma "$SCRIPTDIR/opam")
+if [[ "$OSTYPE" == cygwin ]]; then
+	OPAMPACKAGES=$(cygpath -ma "$SCRIPTDIR/opam")
 else
-  OPAMPACKAGES="$SCRIPTDIR/opam"
+	OPAMPACKAGES="$SCRIPTDIR/opam"
 fi

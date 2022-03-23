@@ -9,7 +9,7 @@
 # See https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt
 
 function print_usage {
-cat <<"EOH"
+	cat <<"EOH"
 coq_platform_make.sh [options]
 
 Create a new opam switch and make and install the Coq Platform in this switch.
@@ -41,51 +41,52 @@ OPTIONS:
 EOH
 }
 
-for arg in "$@"
-do
-  case "$arg" in
-    -help|-h)      print_usage; false;;
-    -extent=*)     COQ_PLATFORM_EXTENT="${arg#*=}";;
-    -packages=*)   COQ_PLATFORM_PACKAGE_PICK_NAME="${arg#*=}";;
-    -pick=*)       COQ_PLATFORM_PACKAGE_PICK_NAME="${arg#*=}";;
-    -parallel=*)   COQ_PLATFORM_PARALLEL="${arg#*=}";;
-    -jobs=*)       COQ_PLATFORM_JOBS="${arg#*=}";;
-    -compcert=*)   COQ_PLATFORM_COMPCERT="${arg#*=}";;
-    -vst=*)        COQ_PLATFORM_VST="${arg#*=}";;
-    -switch=*)     COQ_PLATFORM_SWITCH="${arg#*=}";;
-    -set-switch=*) COQ_PLATFORM_SET_SWITCH="${arg#*=}";;
-    -dumplogs)     COQ_PLATFORM_DUMP_LOGS=y;;
-    -opamonly)     COQ_PLATFORM_OPAM_ONLY=y;;
-    -override-dev-pkg=*) COQ_PLATFORM_OVERRIDE_DEV="${COQ_PLATFORM_OVERRIDE_DEV} ${arg#*=}";;
-    *) echo "ERROR: Unknown command line argument $arg!"; print_usage; false;;
-  esac
+for arg in "$@"; do
+	case "$arg" in
+	-help | -h)
+		print_usage
+		false
+		;;
+	-extent=*) COQ_PLATFORM_EXTENT="${arg#*=}" ;;
+	-packages=*) COQ_PLATFORM_PACKAGE_PICK_NAME="${arg#*=}" ;;
+	-pick=*) COQ_PLATFORM_PACKAGE_PICK_NAME="${arg#*=}" ;;
+	-parallel=*) COQ_PLATFORM_PARALLEL="${arg#*=}" ;;
+	-jobs=*) COQ_PLATFORM_JOBS="${arg#*=}" ;;
+	-compcert=*) COQ_PLATFORM_COMPCERT="${arg#*=}" ;;
+	-vst=*) COQ_PLATFORM_VST="${arg#*=}" ;;
+	-switch=*) COQ_PLATFORM_SWITCH="${arg#*=}" ;;
+	-set-switch=*) COQ_PLATFORM_SET_SWITCH="${arg#*=}" ;;
+	-dumplogs) COQ_PLATFORM_DUMP_LOGS=y ;;
+	-opamonly) COQ_PLATFORM_OPAM_ONLY=y ;;
+	-override-dev-pkg=*) COQ_PLATFORM_OVERRIDE_DEV="${COQ_PLATFORM_OVERRIDE_DEV} ${arg#*=}" ;;
+	*)
+		echo "ERROR: Unknown command line argument $arg!"
+		print_usage
+		false
+		;;
+	esac
 done
 
 # allow short form names for packages
-if [ -n "${COQ_PLATFORM_PACKAGE_PICK_NAME:+x}" ]
-then
-  for prefix1 in "" "package_picks/"
-  do
-    for prefix2 in "" "package-pick-"
-    do
-      for postfix in "" ".sh"
-      do
-        testname="${prefix1}${prefix2}${COQ_PLATFORM_PACKAGE_PICK_NAME}${postfix}"
-        if [ -f "${testname}" ]
-        then
-          COQ_PLATFORM_PACKAGE_PICK_FILE="${testname}"
-        fi
-      done
-    done
-  done
+if [ -n "${COQ_PLATFORM_PACKAGE_PICK_NAME:+x}" ]; then
+	for prefix1 in "" "package_picks/"; do
+		for prefix2 in "" "package-pick-"; do
+			for postfix in "" ".sh"; do
+				testname="${prefix1}${prefix2}${COQ_PLATFORM_PACKAGE_PICK_NAME}${postfix}"
+				if [ -f "${testname}" ]; then
+					COQ_PLATFORM_PACKAGE_PICK_FILE="${testname}"
+				fi
+			done
+		done
+	done
 fi
 
-check_value_enumeraton  "${COQ_PLATFORM_EXTENT:-__unset__}"   "[xfbi]" "-extent/COQ_PLATFORM_EXTENT"
-check_value_enumeraton  "${COQ_PLATFORM_PARALLEL:-__unset__}" "[ps]"  "-parallel/COQ_PLATFORM_PARALLEL"
-check_value_range       "${COQ_PLATFORM_JOBS:-__unset__}"     1 16    "-jobs/COQ_PLATFORM_JOBS"
-check_value_enumeraton  "${COQ_PLATFORM_COMPCERT:-__unset__}" "[yn]"  "-compcert/COQ_PLATFORM_COMPCERT"
-check_value_enumeraton  "${COQ_PLATFORM_VST:-__unset__}"      "[yn]"  "-vst/COQ_PLATFORM_VST"
-check_value_enumeraton  "${COQ_PLATFORM_SWITCH:-__unset__}"   "[kd]"  "-switch/COQ_PLATFORM_SWITCH"
-check_value_enumeraton  "${COQ_PLATFORM_DUMP_LOGS:-__unset__}" "[yn]"  "-dumplogs/COQ_PLATFORM_DUMP_LOGS"
-check_value_enumeraton  "${COQ_PLATFORM_OPAM_ONLY:-__unset__}" "[yn]"  "-opamonly/COQ_PLATFORM_OPAM_ONLY"
+check_value_enumeraton "${COQ_PLATFORM_EXTENT:-__unset__}" "[xfbi]" "-extent/COQ_PLATFORM_EXTENT"
+check_value_enumeraton "${COQ_PLATFORM_PARALLEL:-__unset__}" "[ps]" "-parallel/COQ_PLATFORM_PARALLEL"
+check_value_range "${COQ_PLATFORM_JOBS:-__unset__}" 1 16 "-jobs/COQ_PLATFORM_JOBS"
+check_value_enumeraton "${COQ_PLATFORM_COMPCERT:-__unset__}" "[yn]" "-compcert/COQ_PLATFORM_COMPCERT"
+check_value_enumeraton "${COQ_PLATFORM_VST:-__unset__}" "[yn]" "-vst/COQ_PLATFORM_VST"
+check_value_enumeraton "${COQ_PLATFORM_SWITCH:-__unset__}" "[kd]" "-switch/COQ_PLATFORM_SWITCH"
+check_value_enumeraton "${COQ_PLATFORM_DUMP_LOGS:-__unset__}" "[yn]" "-dumplogs/COQ_PLATFORM_DUMP_LOGS"
+check_value_enumeraton "${COQ_PLATFORM_OPAM_ONLY:-__unset__}" "[yn]" "-opamonly/COQ_PLATFORM_OPAM_ONLY"
 check_value_file_exists "${COQ_PLATFORM_PACKAGE_PICK_FILE:-__unset__}" "-packages/COQ_PLATFORM_PACKAGE_PICK_FILE"

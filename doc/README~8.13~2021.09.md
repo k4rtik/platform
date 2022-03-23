@@ -29,7 +29,7 @@ plan to use these packages.
 The license information given below is obtained from opam.
 The Coq Platform team does no double check this information.
 
-**Note on multiple licenses:** 
+**Note on multiple licenses:**
 In case several licenses are given below, it is not clearly specified what this means.
 It could mean that parts of the software use one license while other parts use another license.
 It could also mean that you can choose between the given licenses.
@@ -323,7 +323,7 @@ The **full level** contains the following packages:
       (<a href='https://github.com/HoTT/HoTT/issues'>bug reports</a>)
       (<a href='https://coq.inria.fr/opam/released/packages/coq-hott/coq-hott.8.13/opam'>opam package</a>)
     </dd>
-    <dt><b>description</b></dt><dd>To use the HoTT library, the following flags must be passed to coqc:n   -noinit -indices-matternTo use the HoTT library in a project, add the following to _CoqProject:n   -arg -noinitn   -arg -indices-matter</dd>
+<dt><b>description</b></dt><dd>To use the HoTT library, the following flags must be passed to coqc:n   -noinit -indices-matternTo use the HoTT library in a project, add the following to_CoqProject:n   -arg -noinitn   -arg -indices-matter</dd>
   </dl>
 </details>
 
@@ -503,7 +503,7 @@ The **full level** contains the following packages:
       (<a href='https://github.com/math-comp/finmap/issues'>bug reports</a>)
       (<a href='https://coq.inria.fr/opam/released/packages/coq-mathcomp-finmap/coq-mathcomp-finmap.1.5.1/opam'>opam package</a>)
     </dd>
-    <dt><b>description</b></dt><dd>This library is an extension of mathematical component in order tonsupport finite sets and finite maps on choicetypes (rather that finitentypes). This includes support for functions with finite support andnmultisets. The library also contains a generic order and set libary,nwhich will be used to subsume notations for finite sets, eventually.</dd>
+    <dt><b>description</b></dt><dd>This library is an extension of mathematical component in order tonsupport finite sets and finite maps on choicetypes (rather that finitentypes). This includes support for functions with finite support andnmultisets. The library also contains a generic order and set library,nwhich will be used to subsume notations for finite sets, eventually.</dd>
   </dl>
 </details>
 
@@ -668,7 +668,7 @@ The **full level** contains the following packages:
       (<a href='https://github.com/Lysxia/coq-simple-io/issues'>bug reports</a>)
       (<a href='https://coq.inria.fr/opam/released/packages/coq-simple-io/coq-simple-io.1.6.0/opam'>opam package</a>)
     </dd>
-    <dt><b>description</b></dt><dd>This library provides tools to implement IO programs directly in Coq, in ansimilar style to Haskell. Facilities for formal verification are not included.nnIO is defined as a parameter with a purely functional interface in Coq,nto be extracted to OCaml. Some wrappers for the basic types and functions innthe OCaml Pervasives module are provided. Users are free to define their ownnAPIs on top of this IO type.</dd>
+    <dt><b>description</b></dt><dd>This library provides tools to implement IO programs directly in Coq, in ansimilar style to Haskell. Facilities for formal verification are not included.nnIO is defined as a parameter with a purely functional interface in Coq,not be extracted to OCaml. Some wrappers for the basic types and functions innthe OCaml Pervasives module are provided. Users are free to define their ownnAPIs on top of this IO type.</dd>
   </dl>
 </details>
 

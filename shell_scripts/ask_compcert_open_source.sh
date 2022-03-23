@@ -12,11 +12,9 @@
 
 # CompCert open source or full
 
-if [ -z "${COQ_PLATFORM_COMPCERT:+x}" ]
-then
-  if  [[ "${COQ_PLATFORM_EXTENT}"  =~ ^[fFxX] ]]
-  then
-cat <<EOH
+if [ -z "${COQ_PLATFORM_COMPCERT:+x}" ]; then
+	if [[ "${COQ_PLATFORM_EXTENT}" =~ ^[fFxX] ]]; then
+		cat <<EOH
 ================================== COMPCERT ==================================
 The Coq Platform installs the formally verified C compiler CompCert.
 
@@ -38,9 +36,9 @@ installing only its open source parts, since evaluation usage is explicitly
 allowed in the license (see link above).
 ================================== COMPCERT ==================================
 EOH
-    ask_user_opt2_cancel "Install non open source SW CompCert (y) or (n)?" yY "install CompCert" nN "do not install CompCert"
-    COQ_PLATFORM_COMPCERT=$ANSWER
-  else
-    COQ_PLATFORM_COMPCERT=n
-  fi
+		ask_user_opt2_cancel "Install non open source SW CompCert (y) or (n)?" yY "install CompCert" nN "do not install CompCert"
+		COQ_PLATFORM_COMPCERT=$ANSWER
+	else
+		COQ_PLATFORM_COMPCERT=n
+	fi
 fi

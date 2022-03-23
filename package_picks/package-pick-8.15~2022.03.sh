@@ -53,122 +53,123 @@ PACKAGES="${PACKAGES} coq.8.15.0"
 ########## IDE PACKAGES ##########
 
 # GTK based IDE for Coq - alternatives are VSCoq and Proofgeneral for Emacs
-if  [[ "${COQ_PLATFORM_EXTENT}"  =~ ^[iIfFxX] ]]
-then
-PACKAGES="${PACKAGES} coqide.8.15.0 lablgtk3.3.1.2"
+if [[ "${COQ_PLATFORM_EXTENT}" =~ ^[iIfFxX] ]]; then
+	PACKAGES="${PACKAGES} coqide.8.15.0 lablgtk3.3.1.2"
 fi
 
 ########## "FULL" COQ PLATFORM PACKAGES ##########
 
-if  [[ "${COQ_PLATFORM_EXTENT}"  =~ ^[fFxX] ]]
-then
-  # Standard library extensions
-  PACKAGES="${PACKAGES} coq-bignums.8.15.0"
-  PACKAGES="${PACKAGES} coq-ext-lib.0.11.6"
-  PACKAGES="${PACKAGES} coq-stdpp.1.7.0"
+if [[ "${COQ_PLATFORM_EXTENT}" =~ ^[fFxX] ]]; then
+	# Standard library extensions
+	PACKAGES="${PACKAGES} coq-bignums.8.15.0"
+	PACKAGES="${PACKAGES} coq-ext-lib.0.11.6"
+	PACKAGES="${PACKAGES} coq-stdpp.1.7.0"
 
-  # General mathematics
-  PACKAGES="${PACKAGES} coq-mathcomp-ssreflect.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-fingroup.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-algebra.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-solvable.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-field.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-character.1.14.0"
-  PACKAGES="${PACKAGES} coq-mathcomp-bigenough.1.0.1"
-  PACKAGES="${PACKAGES} coq-mathcomp-finmap.1.5.1"
-  PACKAGES="${PACKAGES} coq-mathcomp-real-closed.1.1.2"
-  PACKAGES="${PACKAGES} coq-mathcomp-zify.1.2.0+1.12+8.13"
-  PACKAGES="${PACKAGES} coq-mathcomp-multinomials.1.5.5"
-  PACKAGES="${PACKAGES} coq-coquelicot.3.2.0"
+	# General mathematics
+	PACKAGES="${PACKAGES} coq-mathcomp-ssreflect.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-fingroup.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-algebra.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-solvable.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-field.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-character.1.14.0"
+	PACKAGES="${PACKAGES} coq-mathcomp-bigenough.1.0.1"
+	PACKAGES="${PACKAGES} coq-mathcomp-finmap.1.5.1"
+	PACKAGES="${PACKAGES} coq-mathcomp-real-closed.1.1.2"
+	PACKAGES="${PACKAGES} coq-mathcomp-zify.1.2.0+1.12+8.13"
+	PACKAGES="${PACKAGES} coq-mathcomp-multinomials.1.5.5"
+	PACKAGES="${PACKAGES} coq-coquelicot.3.2.0"
 
-  # Number theory
-  PACKAGES="${PACKAGES} coq-coqprime.1.1.1"
-  PACKAGES="${PACKAGES} coq-coqprime-generator.1.1.1"
-  
-  # Numerical mathematics
-  PACKAGES="${PACKAGES} coq-flocq.3.4.3"
-  PACKAGES="${PACKAGES} coq-interval.4.4.0"
-  PACKAGES="${PACKAGES} coq-gappa.1.5.1 gappa.1.4.0"
+	# Number theory
+	PACKAGES="${PACKAGES} coq-coqprime.1.1.1"
+	PACKAGES="${PACKAGES} coq-coqprime-generator.1.1.1"
 
-  # Constructive mathematics
-  PACKAGES="${PACKAGES} coq-math-classes.8.15.0"
-  PACKAGES="${PACKAGES} coq-corn.8.13.0"
+	# Numerical mathematics
+	PACKAGES="${PACKAGES} coq-flocq.3.4.3"
+	PACKAGES="${PACKAGES} coq-interval.4.4.0"
+	PACKAGES="${PACKAGES} coq-gappa.1.5.1 gappa.1.4.0"
 
-  # Homotopy Type Theory (HoTT)
-  PACKAGES="${PACKAGES} coq-hott.8.15"
+	# Constructive mathematics
+	PACKAGES="${PACKAGES} coq-math-classes.8.15.0"
+	PACKAGES="${PACKAGES} coq-corn.8.13.0"
 
-  # Univalent Mathematics (UniMath)
-  # Note: coq-unimath requires too much memory for 32 bit architectures
-  if [ "${BITSIZE}" == "64" ]
-  then
-    PACKAGES="${PACKAGES} coq-unimath.20220204"
-  fi 
+	# Homotopy Type Theory (HoTT)
+	PACKAGES="${PACKAGES} coq-hott.8.15"
 
-  # Code extraction
-  PACKAGES="${PACKAGES} coq-simple-io.1.7.0"
+	# Univalent Mathematics (UniMath)
+	# Note: coq-unimath requires too much memory for 32 bit architectures
+	if [ "${BITSIZE}" == "64" ]; then
+		PACKAGES="${PACKAGES} coq-unimath.20220204"
+	fi
 
-  # Proof automation / generation / helpers
-  PACKAGES="${PACKAGES} coq-menhirlib.20211230 menhir.20211230"
-  PACKAGES="${PACKAGES} coq-equations.1.3+8.15"
-  PACKAGES="${PACKAGES} coq-aac-tactics.8.15.1"
-  PACKAGES="${PACKAGES} coq-unicoq.1.6+8.15"
-  PACKAGES="${PACKAGES} coq-mtac2.1.4+8.15"
-  PACKAGES="${PACKAGES} coq-elpi.1.13.0 elpi.1.14.1"
-  PACKAGES="${PACKAGES} coq-hierarchy-builder.1.2.1"
-  PACKAGES="${PACKAGES} coq-quickchick.1.6.1"
-  PACKAGES="${PACKAGES} coq-hammer-tactics.1.3.2+8.15"
-  if [[ "$OSTYPE" != cygwin ]]
-  then
-    # coq-hammer does not work on Windows because it heavily relies on fork
-    PACKAGES="${PACKAGES} coq-hammer.1.3.2+8.15"
-    PACKAGES="${PACKAGES} eprover.2.6"
-    PACKAGES="${PACKAGES} z3_tptp.4.8.13"
-  fi
-  PACKAGES="${PACKAGES} coq-paramcoq.1.1.3+coq8.15"
-  PACKAGES="${PACKAGES} coq-coqeal.1.1.0"
-  PACKAGES="${PACKAGES} coq-libhyps.2.0.5"
+	# Code extraction
+	PACKAGES="${PACKAGES} coq-simple-io.1.7.0"
 
-  # General mathematics (which requires one of the above tools)
-  PACKAGES="${PACKAGES} coq-mathcomp-analysis.0.3.13"
+	# Proof automation / generation / helpers
+	PACKAGES="${PACKAGES} coq-menhirlib.20211230 menhir.20211230"
+	PACKAGES="${PACKAGES} coq-equations.1.3+8.15"
+	PACKAGES="${PACKAGES} coq-aac-tactics.8.15.1"
+	PACKAGES="${PACKAGES} coq-unicoq.1.6+8.15"
+	PACKAGES="${PACKAGES} coq-mtac2.1.4+8.15"
+	PACKAGES="${PACKAGES} coq-elpi.1.13.0 elpi.1.14.1"
+	PACKAGES="${PACKAGES} coq-hierarchy-builder.1.2.1"
+	PACKAGES="${PACKAGES} coq-quickchick.1.6.1"
+	PACKAGES="${PACKAGES} coq-hammer-tactics.1.3.2+8.15"
+	if [[ "$OSTYPE" != cygwin ]]; then
+		# coq-hammer does not work on Windows because it heavily relies on fork
+		PACKAGES="${PACKAGES} coq-hammer.1.3.2+8.15"
+		PACKAGES="${PACKAGES} eprover.2.6"
+		PACKAGES="${PACKAGES} z3_tptp.4.8.13"
+	fi
+	PACKAGES="${PACKAGES} coq-paramcoq.1.1.3+coq8.15"
+	PACKAGES="${PACKAGES} coq-coqeal.1.1.0"
+	PACKAGES="${PACKAGES} coq-libhyps.2.0.5"
 
-  # Formal languages, compilers and code verification
-  PACKAGES="${PACKAGES} coq-reglang.1.1.3"
-  PACKAGES="${PACKAGES} coq-iris.3.6.0"
-  PACKAGES="${PACKAGES} coq-iris-heap-lang.3.6.0"
+	# General mathematics (which requires one of the above tools)
+	PACKAGES="${PACKAGES} coq-mathcomp-analysis.0.3.13"
 
-  case "$COQ_PLATFORM_COMPCERT" in
-    [yY]) PACKAGES="${PACKAGES} coq-compcert.3.10" ;;
-    [nN]) true ;;
-    *) echo "Illegal value for COQ_PLATFORM_COMPCERT - aborting"; false ;;
-  esac
+	# Formal languages, compilers and code verification
+	PACKAGES="${PACKAGES} coq-reglang.1.1.3"
+	PACKAGES="${PACKAGES} coq-iris.3.6.0"
+	PACKAGES="${PACKAGES} coq-iris-heap-lang.3.6.0"
 
-  case "$COQ_PLATFORM_VST" in
-    [yY]) PACKAGES="${PACKAGES} coq-vst.2.9.1" ;;
-    [nN]) true ;;
-    *) echo "Illegal value for COQ_PLATFORM_VST - aborting"; false ;;
-  esac
+	case "$COQ_PLATFORM_COMPCERT" in
+	[yY]) PACKAGES="${PACKAGES} coq-compcert.3.10" ;;
+	[nN]) true ;;
+	*)
+		echo "Illegal value for COQ_PLATFORM_COMPCERT - aborting"
+		false
+		;;
+	esac
 
-  # Proof analysis and other tools
-  PACKAGES="${PACKAGES} coq-dpdgraph.1.0+8.15"
+	case "$COQ_PLATFORM_VST" in
+	[yY]) PACKAGES="${PACKAGES} coq-vst.2.9.1" ;;
+	[nN]) true ;;
+	*)
+		echo "Illegal value for COQ_PLATFORM_VST - aborting"
+		false
+		;;
+	esac
+
+	# Proof analysis and other tools
+	PACKAGES="${PACKAGES} coq-dpdgraph.1.0+8.15"
 
 fi
 
 ########## EXTENDED" COQ PLATFORM PACKAGES ##########
 
-if  [[ "${COQ_PLATFORM_EXTENT}"  =~ ^[xX] ]]
-then
+if [[ "${COQ_PLATFORM_EXTENT}" =~ ^[xX] ]]; then
 
-  # General mathematics
-  PACKAGES="${PACKAGES} coq-mathcomp-algebra-tactics.0.3.0"
-  
-    # Proof automation / generation / helpers
-  PACKAGES="${PACKAGES} coq-deriving.0.1.0"
+	# General mathematics
+	PACKAGES="${PACKAGES} coq-mathcomp-algebra-tactics.0.3.0"
 
-  # Gallina extensions
-  PACKAGES="${PACKAGES} coq-reduction-effects.0.1.3"
-  PACKAGES="${PACKAGES} coq-record-update.0.3.0"
+	# Proof automation / generation / helpers
+	PACKAGES="${PACKAGES} coq-deriving.0.1.0"
 
-  # Communication with coqtop
-  PACKAGES="${PACKAGES} coq-serapi.8.15.0+0.15.0"
+	# Gallina extensions
+	PACKAGES="${PACKAGES} coq-reduction-effects.0.1.3"
+	PACKAGES="${PACKAGES} coq-record-update.0.3.0"
+
+	# Communication with coqtop
+	PACKAGES="${PACKAGES} coq-serapi.8.15.0+0.15.0"
 
 fi

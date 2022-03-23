@@ -19,11 +19,11 @@ opam depext frama-c
 
 opam install frama-c
 
-# depext supported systems:
+# depext supported systems
 
-https://github.com/ocaml-opam/opam-depext
+<https://github.com/ocaml-opam/opam-depext>
 
-## depext on cygwin:
+## depext on cygwin
 
-https://fdopen.github.io/opam-repository-mingw/depext-cygwin/
+<https://fdopen.github.io/opam-repository-mingw/depext-cygwin/>
 

@@ -5,7 +5,7 @@ The web UI only lets you do this for the default branch, in order to run the
 `./github_actions/run_snap.sh`.
 
 First of all you need to generate (once and forall) a token from
-https://github.com/settings/tokens (tick the "workflow" box).
+<https://github.com/settings/tokens> (tick the "workflow" box).
 
 Then:
 ```shell

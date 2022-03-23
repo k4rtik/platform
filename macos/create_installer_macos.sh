@@ -36,30 +36,45 @@ SIGN='N'
 SIGN_CERT=''
 SIGN_ID=''
 
-for arg in "$@"
-do
-  case "${arg}" in
-    -quick|-q) ZIPCOMPR='-format UDRO'; CHECKOPAMLINKS='N'; CREATEREADME='N' ;;
-    -install|-i) INSTALL='Y' ;;
-    -otooldump) OTOOLDUMP='Y' ;;
-    -sign) SIGN='Y' ;;
-    -signcert=*) SIGN_CERT="${arg#*=}" ;;
-    -signid=*) SIGN_ID="${arg#*=}" ;;
-    *) echo "ERROR: Unknown command line argument ${arg}!"; false;;
-  esac
+for arg in "$@"; do
+	case "${arg}" in
+	-quick | -q)
+		ZIPCOMPR='-format UDRO'
+		CHECKOPAMLINKS='N'
+		CREATEREADME='N'
+		;;
+	-install | -i) INSTALL='Y' ;;
+	-otooldump) OTOOLDUMP='Y' ;;
+	-sign) SIGN='Y' ;;
+	-signcert=*) SIGN_CERT="${arg#*=}" ;;
+	-signid=*) SIGN_ID="${arg#*=}" ;;
+	*)
+		echo "ERROR: Unknown command line argument ${arg}!"
+		false
+		;;
+	esac
 done
 
 ###### Check if required system utilities are installed #####
 
-command -v gfind &> /dev/null || ( echo "Please install gfind (eg. sudo port install findutils)" ; exit 1)
-command -v grealpath &> /dev/null || ( echo "Please install grealpath (eg. sudo port install coreutils)" ; exit 1)
-command -v macpack  &> /dev/null || ( echo "Please install macpack (eg. sudo port install py38-pip; port select --set pip3 pip38; pip3 install macpack)" ; exit 1)
+command -v gfind &>/dev/null || (
+	echo "Please install gfind (eg. sudo port install findutils)"
+	exit 1
+)
+command -v grealpath &>/dev/null || (
+	echo "Please install grealpath (eg. sudo port install coreutils)"
+	exit 1
+)
+command -v macpack &>/dev/null || (
+	echo "Please install macpack (eg. sudo port install py38-pip; port select --set pip3 pip38; pip3 install macpack)"
+	exit 1
+)
 
 ##### Get the release and package pick of the Coq Platform #####
 
 source shell_scripts/get_names_from_switch.sh
 
-echo "##### Coq Platform release = ${COQ_PLATFORM_RELEASE} version = ${COQ_PLATFORM_PACKAGE_PICK_POSTFIX} #####" 
+echo "##### Coq Platform release = ${COQ_PLATFORM_RELEASE} version = ${COQ_PLATFORM_PACKAGE_PICK_POSTFIX} #####"
 
 ###### Create working folder and cd #####
 
@@ -99,9 +114,9 @@ DYNLIB_ABSDIR="$RSRC_ABSDIR/lib/dylib"
 
 mkdir -p ${APP_ABSDIR}
 mkdir ${APP_ABSDIR}/Contents/
-mkdir ${APP_ABSDIR}/Contents/MacOS  # The top level executable shown in launcher
-mkdir -p ${RSRC_ABSDIR}             # Most files go here
-mkdir -p ${DYNLIB_ABSDIR}           # System shared libraries
+mkdir ${APP_ABSDIR}/Contents/MacOS # The top level executable shown in launcher
+mkdir -p ${RSRC_ABSDIR}            # Most files go here
+mkdir -p ${DYNLIB_ABSDIR}          # System shared libraries
 
 ##### opam folder variables #####
 
@@ -115,14 +130,14 @@ PORTCMD="$(which port)"
 set -e
 
 if [ -z "${PORTCMD}" ]; then
-  PKG_MANAGER=brew
-  PKG_MANAGER_ROOT="/usr/local/"
-  PKG_MANAGER_ROOT_STRIP="/usr/local/Cellar/*/*/" # one * for the package name and one for its version
+	PKG_MANAGER=brew
+	PKG_MANAGER_ROOT="/usr/local/"
+	PKG_MANAGER_ROOT_STRIP="/usr/local/Cellar/*/*/" # one * for the package name and one for its version
 else
-  PKG_MANAGER=port
-  # If someone knows a better way to find out where port is installed, please let me know!
-  PKG_MANAGER_ROOT="${PORTCMD%bin/port}"
-  PKG_MANAGER_ROOT_STRIP="${PORTCMD%bin/port}"
+	PKG_MANAGER=port
+	# If someone knows a better way to find out where port is installed, please let me know!
+	PKG_MANAGER_ROOT="${PORTCMD%bin/port}"
+	PKG_MANAGER_ROOT_STRIP="${PORTCMD%bin/port}"
 fi
 
 ###################### UTILITY FUNCTIONS ######################
@@ -132,7 +147,7 @@ fi
 # $2 = item
 
 function list_contains {
-    [[ " $1 " == *" $2 "* ]]
+	[[ " $1 " == *" $2 "* ]]
 }
 
 # Check if a list contains an item with prefix
@@ -140,24 +155,23 @@ function list_contains {
 # $2 = prefix
 
 function list_contains_prefix {
-    [[ " $1 " == *" $2"* ]]
+	[[ " $1 " == *" $2"* ]]
 }
 
 # Find shared library dependencies and patch one binary using macpack
 # $1 full path to binary
 # $3 relative path from binary to "${RSRC_ABSDIR}" filder
 
-> logs/macpack.log
+>logs/macpack.log
 
 function add_dylibs_using_macpack {
-  type="$(file -b $1)"
-  if [ "${type}" == 'Mach-O 64-bit executable x86_64' ] || [ "${type}" == 'Mach-O 64-bit bundle x86_64' ]
-  then
-    echo "Copying shared libraries for $1 ..."
-    macpack -v -d "$2"/lib/dylib $1 >> logs/macpack.log
-  else
-    echo "INFO: File '$1' with type '${type}' ignored in shared library analysis."
-  fi
+	type="$(file -b $1)"
+	if [ "${type}" == 'Mach-O 64-bit executable x86_64' ] || [ "${type}" == 'Mach-O 64-bit bundle x86_64' ]; then
+		echo "Copying shared libraries for $1 ..."
+		macpack -v -d "$2"/lib/dylib $1 >>logs/macpack.log
+	else
+		echo "INFO: File '$1' with type '${type}' ignored in shared library analysis."
+	fi
 }
 
 # Add files from a Brew package using package name and grp filter
@@ -167,22 +181,21 @@ function add_dylibs_using_macpack {
 # This function strips the install path of the "port" command
 
 function add_files_of_package {
-  case $PKG_MANAGER in
-  port)
-    LIST_PKG_CONTENTS="port contents"
-  ;;
-  brew)
-    LIST_PKG_CONTENTS="brew ls -v"
-  ;;
-  esac
-  echo "Copying files from package $1 ..."
-  for file in $($LIST_PKG_CONTENTS "$1" | grep "$2" | sort -u)
-  do
-    relpath="${file#${PKG_MANAGER_ROOT_STRIP}}"
-    reldir="${relpath%/*}"
-    mkdir -p "$RSRC_ABSDIR/$reldir"
-    cp "$file" "$RSRC_ABSDIR/$reldir/"
-  done
+	case $PKG_MANAGER in
+	port)
+		LIST_PKG_CONTENTS="port contents"
+		;;
+	brew)
+		LIST_PKG_CONTENTS="brew ls -v"
+		;;
+	esac
+	echo "Copying files from package $1 ..."
+	for file in $($LIST_PKG_CONTENTS "$1" | grep "$2" | sort -u); do
+		relpath="${file#${PKG_MANAGER_ROOT_STRIP}}"
+		reldir="${relpath%/*}"
+		mkdir -p "$RSRC_ABSDIR/$reldir"
+		cp "$file" "$RSRC_ABSDIR/$reldir/"
+	done
 }
 
 # Add a folder recursively
@@ -190,9 +203,9 @@ function add_files_of_package {
 # $2 = relative path to $1 and ${RSRC_ABSDIR} (must not start with /)
 
 function add_folder_recursively {
-  echo "Copying files from folder $1/$2 ..."
-  mkdir -p "${RSRC_ABSDIR}/$2/"
-  cp -R "$1/$2/" "${RSRC_ABSDIR}/$2/"
+	echo "Copying files from folder $1/$2 ..."
+	mkdir -p "${RSRC_ABSDIR}/$2/"
+	cp -R "$1/$2/" "${RSRC_ABSDIR}/$2/"
 }
 
 # Add a single file
@@ -201,110 +214,110 @@ function add_folder_recursively {
 # $3 = file name
 
 function add_single_file {
-  echo "Copying single file $1/$2/$3"
-  mkdir -p "${RSRC_ABSDIR}/$2"
-  cp "$1/$2/$3" "${RSRC_ABSDIR}/$2/"
+	echo "Copying single file $1/$2/$3"
+	mkdir -p "${RSRC_ABSDIR}/$2"
+	cp "$1/$2/$3" "${RSRC_ABSDIR}/$2/"
 }
 
 # Taken from Adwanita's Makefile
 # $1 = root of the icon theme
 
 function make_theme_index {
-pushd "$1"
+	pushd "$1"
 
-cat> index.theme <<'EOT'
+	cat >index.theme <<'EOT'
 [Icon Theme]
 Name=Adwaita
 Comment=The Only One
 Example=folder
 
 EOT
-echo "Directories=$(find */* -type d | tr -s "\n" ,)" >> index.theme
-echo "" >> index.theme
+	echo "Directories=$(find */* -type d | tr -s "\n" ,)" >>index.theme
+	echo "" >>index.theme
 
-(
-for dir in `find */* -type d`; do
-    sizefull="`dirname $dir`"
-    if test "$sizefull" = "scalable"; then
-        size="16"
-    elif test "$sizefull" = "scalable-up-to-32"; then
-        size="16"
-    else
-        size="`echo $sizefull | sed -e 's/x.*$//g'`"
-    fi
-    context="`basename $dir`"
-    echo "[$dir]"
-    if test "$context" = "actions"; then
-        echo "Context=Actions"
-    fi
-    if test "$context" = "animations"; then
-        echo "Context=Animations"
-    fi
-    if test "$context" = "apps"; then
-        echo "Context=Applications"
-    fi
-    if test "$context" = "categories"; then
-        echo "Context=Categories"
-    fi
-    if test "$context" = "devices"; then
-        echo "Context=Devices"
-    fi
-    if test "$context" = "emblems"; then
-        echo "Context=Emblems"
-    fi
-    if test "$context" = "emotes"; then
-        echo "Context=Emotes"
-    fi
-    if test "$context" = "intl"; then
-        echo "Context=International"
-    fi
-    if test "$context" = "mimetypes"; then
-        echo "Context=MimeTypes"
-    fi
-    if test "$context" = "places"; then
-        echo "Context=Places"
-    fi
-    if test "$context" = "status"; then
-        echo "Context=Status"
-    fi
-    if test "$context" = "ui"; then
-        echo "Context=UI"
-    fi
-    if test "$context" = "legacy"; then
-        echo "Context=Legacy"
-    fi
-    echo "Size=$size"
-    if test "$sizefull" = "scalable"; then
-        echo "MinSize=8"
-        echo "MaxSize=512"
-        echo "Type=Scalable"
-    elif test "$sizefull" = "scalable-up-to-32"; then
-        echo "MinSize=16"
-        echo "MaxSize=32"
-        echo "Type=Scalable"
-    elif test "$size" = "256"; then
-        echo "MinSize=56"
-        echo "MaxSize=256"
-        echo "Type=Scalable"
-    elif test "$size" = "512"; then
-        echo "MinSize=56"
-        echo "MaxSize=512"
-        echo "Type=Scalable"
-    else
-        echo "Type=Fixed"
-    fi
-    echo ""
-done
-) >> index.theme
+	(
+		for dir in $(find */* -type d); do
+			sizefull="$(dirname $dir)"
+			if test "$sizefull" = "scalable"; then
+				size="16"
+			elif test "$sizefull" = "scalable-up-to-32"; then
+				size="16"
+			else
+				size="$(echo $sizefull | sed -e 's/x.*$//g')"
+			fi
+			context="$(basename $dir)"
+			echo "[$dir]"
+			if test "$context" = "actions"; then
+				echo "Context=Actions"
+			fi
+			if test "$context" = "animations"; then
+				echo "Context=Animations"
+			fi
+			if test "$context" = "apps"; then
+				echo "Context=Applications"
+			fi
+			if test "$context" = "categories"; then
+				echo "Context=Categories"
+			fi
+			if test "$context" = "devices"; then
+				echo "Context=Devices"
+			fi
+			if test "$context" = "emblems"; then
+				echo "Context=Emblems"
+			fi
+			if test "$context" = "emotes"; then
+				echo "Context=Emotes"
+			fi
+			if test "$context" = "intl"; then
+				echo "Context=International"
+			fi
+			if test "$context" = "mimetypes"; then
+				echo "Context=MimeTypes"
+			fi
+			if test "$context" = "places"; then
+				echo "Context=Places"
+			fi
+			if test "$context" = "status"; then
+				echo "Context=Status"
+			fi
+			if test "$context" = "ui"; then
+				echo "Context=UI"
+			fi
+			if test "$context" = "legacy"; then
+				echo "Context=Legacy"
+			fi
+			echo "Size=$size"
+			if test "$sizefull" = "scalable"; then
+				echo "MinSize=8"
+				echo "MaxSize=512"
+				echo "Type=Scalable"
+			elif test "$sizefull" = "scalable-up-to-32"; then
+				echo "MinSize=16"
+				echo "MaxSize=32"
+				echo "Type=Scalable"
+			elif test "$size" = "256"; then
+				echo "MinSize=56"
+				echo "MaxSize=256"
+				echo "Type=Scalable"
+			elif test "$size" = "512"; then
+				echo "MinSize=56"
+				echo "MaxSize=512"
+				echo "Type=Scalable"
+			else
+				echo "Type=Fixed"
+			fi
+			echo ""
+		done
+	) >>index.theme
 
-popd
+	popd
 }
 
 # Check if a URL exists
 # $1 url
 
 function check_url {
-  curl --head --silent --fail "$1" >/dev/null
+	curl --head --silent --fail "$1" >/dev/null
 }
 
 # Check if an (opam) license name has an SPDX record
@@ -314,23 +327,20 @@ function check_url {
 declare -A SPDX_LICENSE
 
 function check_spdx_license {
-  if [ -z ${SPDX_LICENSE[$1]+_} ]
-  then
-    if check_url "https://spdx.org/licenses/$1.html"
-    then
-      SPDX_LICENSE[$1]=yes
-    else
-      SPDX_LICENSE[$1]=no
-    fi
-  fi
+	if [ -z ${SPDX_LICENSE[$1]+_} ]; then
+		if check_url "https://spdx.org/licenses/$1.html"; then
+			SPDX_LICENSE[$1]=yes
+		else
+			SPDX_LICENSE[$1]=no
+		fi
+	fi
 
-  if [ "${SPDX_LICENSE[$1]}" == "yes" ]
-  then
-      return 0
-  else
-    echo "License for package '$2' with name '$1' has no SPDX record" >> WARNINGS.log
-    return 1
-  fi
+	if [ "${SPDX_LICENSE[$1]}" == "yes" ]; then
+		return 0
+	else
+		echo "License for package '$2' with name '$1' has no SPDX record" >>WARNINGS.log
+		return 1
+	fi
 }
 
 ###### Get filtered list of explicitly installed packages #####
@@ -347,9 +357,9 @@ PRIMARY_PACKAGES="$(opam list --installed-roots --short --columns=name | grep -v
 declare -A OPAM_FILE_WHITELIST
 declare -A OPAM_FILE_BLACKLIST
 
-OPAM_FILE_WHITELIST[lablgtk3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
-OPAM_FILE_WHITELIST[lablgtk3-sourceview3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
-OPAM_FILE_WHITELIST[cairo2]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[lablgtk3]="stubs.dll$"               # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[lablgtk3 - sourceview3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[cairo2]="stubs.dll$"                 # we keep only the stublib DLL, the rest is linked in coqide
 
 ###### Lits of packages to ignore #####
 
@@ -377,65 +387,56 @@ IGNORED_PACKAGES_RE="^conf-"
 # $2 = dependency level
 
 function process_package {
-  echo "Copying package $1 ($2) ..."
+	echo "Copying package $1 ($2) ..."
 
-  # Copy files
+	# Copy files
 
-  if [ ${OPAM_FILE_WHITELIST[$1]+_} ]
-  then
-    whitelist="${OPAM_FILE_WHITELIST[$1]}"
-  else
-    whitelist="." # take everything
-  fi
+	if [ ${OPAM_FILE_WHITELIST[$1]+_} ]; then
+		whitelist="${OPAM_FILE_WHITELIST[$1]}"
+	else
+		whitelist="." # take everything
+	fi
 
-  if [ ${OPAM_FILE_BLACKLIST[$1]+_} ]
-  then
-    blacklist="${OPAM_FILE_BLACKLIST[$1]}"
-  else
-    blacklist="(\.byte|\.cm[aiox]|\.cmxa|\.o|\.a|\.glob)$" # exclude byte code and library stuff
-  fi
+	if [ ${OPAM_FILE_BLACKLIST[$1]+_} ]; then
+		blacklist="${OPAM_FILE_BLACKLIST[$1]}"
+	else
+		blacklist="(\.byte|\.cm[aiox]|\.cmxa|\.o|\.a|\.glob)$" # exclude byte code and library stuff
+	fi
 
-  files="$(opam show --list-files $1 | grep -E "$whitelist" | grep -E -v "$blacklist" )" || true
-  if echo "$files" | grep '(modified since)' > /dev/null
-  then
-    echo "The package '$1' contains files which have been modified since opam installed them." >> WARNINGS.log
-    files=${files//(modified since)/}
-  fi
-  for file in $files
-  do
-    if [ -d "$file" ]
-    then
-      true # ignore directories
-    elif [ -f "$file" ]
-    then
-      relpath="${file#$OPAM_PREFIX}"
-      reldir="${relpath%/*}"
-      mkdir -p "$RSRC_ABSDIR/$reldir"
-      cp "$file" "$RSRC_ABSDIR/$reldir/"
-    else
-      echo "In package '$1' the file '$file' does not exist"
-      exit 1
-    fi
-  done
+	files="$(opam show --list-files $1 | grep -E "$whitelist" | grep -E -v "$blacklist")" || true
+	if echo "$files" | grep '(modified since)' >/dev/null; then
+		echo "The package '$1' contains files which have been modified since opam installed them." >>WARNINGS.log
+		files=${files//(modified since)/}
+	fi
+	for file in $files; do
+		if [ -d "$file" ]; then
+			true # ignore directories
+		elif [ -f "$file" ]; then
+			relpath="${file#$OPAM_PREFIX}"
+			reldir="${relpath%/*}"
+			mkdir -p "$RSRC_ABSDIR/$reldir"
+			cp "$file" "$RSRC_ABSDIR/$reldir/"
+		else
+			echo "In package '$1' the file '$file' does not exist"
+			exit 1
+		fi
+	done
 
-  # handle dependencies
-  # Note: the --installed is required cause of an opam bug.
-  # See https://github.com/ocaml/opam/issues/4461
-  dependencies="$(opam list --required-by=$1 --short --installed)"
-  for dependency in $dependencies
-  do
-    # Check if dependency is already in the list of known packages
-    if ! list_contains "$PACKAGES_DONE" "$dependency"
-    then
-      # Even if teh package is excluded by IGNORED_PACKAGES_RE, we still want it in the list
-      # so that we can produce an accurate dependency list
-      PACKAGES_DONE="$PACKAGES_DONE $dependency"
-      if [[ ! "$dependency" =~ ${IGNORED_PACKAGES_RE} ]]
-      then
-        process_package "$dependency" $(($2 + 1))
-      fi
-    fi
-  done
+	# handle dependencies
+	# Note: the --installed is required cause of an opam bug.
+	# See https://github.com/ocaml/opam/issues/4461
+	dependencies="$(opam list --required-by=$1 --short --installed)"
+	for dependency in $dependencies; do
+		# Check if dependency is already in the list of known packages
+		if ! list_contains "$PACKAGES_DONE" "$dependency"; then
+			# Even if the package is excluded by IGNORED_PACKAGES_RE, we still want it in the list
+			# so that we can produce an accurate dependency list
+			PACKAGES_DONE="$PACKAGES_DONE $dependency"
+			if [[ ! "$dependency" =~ ${IGNORED_PACKAGES_RE} ]]; then
+				process_package "$dependency" $(($2 + 1))
+			fi
+		fi
+	done
 }
 
 ###################### TOP LEVEL FILE GATHERING ######################
@@ -447,9 +448,8 @@ echo '##### Copy opam packages #####'
 # The initial list of already processed, otherwise processed or ignored packages
 PACKAGES_DONE="$PRIMARY_PACKAGES $IGNORED_PACKAGES"
 
-for package in $PRIMARY_PACKAGES
-do
-  process_package "$package" 0
+for package in $PRIMARY_PACKAGES; do
+	process_package "$package" 0
 done
 
 ##### Find system shared libraries the installed binaries depend on #####
@@ -462,65 +462,62 @@ PIXBUF_LOADER_ABSDIR="$RSRC_ABSDIR/lib/gdk-pixbuf-2.0/2.10.0/loaders"
 mkdir -p "$PIXBUF_LOADER_ABSDIR"
 PIXBUF_LOADER_RELDIR="$(grealpath --relative-to="$PIXBUF_LOADER_ABSDIR" "$RSRC_ABSDIR")"
 for file in $(gdk-pixbuf-query-loaders | grep '/loaders/libpixbufloader-' | sed s/\"//g); do
-  cp ${file} "$PIXBUF_LOADER_ABSDIR/"
+	cp ${file} "$PIXBUF_LOADER_ABSDIR/"
 done
-# the paths are absolue and need to be adjustes to APP_NAME
-(cd "$PIXBUF_LOADER_ABSDIR/"; \
- GDK_PIXBUF_MODULEDIR=. gdk-pixbuf-query-loaders | \
-   sed "s|^\"\\./|\"/Applications/${APP_NAME}/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders/|" > loaders.cache)
-
+# the paths are absolute and need to be adjustes to APP_NAME
+(
+	cd "$PIXBUF_LOADER_ABSDIR/"
+	GDK_PIXBUF_MODULEDIR=. gdk-pixbuf-query-loaders |
+		sed "s|^\"\\./|\"/Applications/${APP_NAME}/Contents/Resources/lib/gdk-pixbuf-2.0/2.10.0/loaders/|" >loaders.cache
+)
 
 IMMODULES_ABSDIR="$RSRC_ABSDIR/lib/gtk-3.0/3.0.0/immodules"
 mkdir -p "$IMMODULES_ABSDIR"
 IMMODULES_RELDIR="$(grealpath --relative-to="$IMMODULES_ABSDIR" "$RSRC_ABSDIR")"
 for file in $(gtk-query-immodules-3.0 | grep /im- | sed s/\"//g); do
-  cp ${file} "$IMMODULES_ABSDIR"
+	cp ${file} "$IMMODULES_ABSDIR"
 done
-# the paths are absolue and need to be adjustes to APP_NAME
-(cd "$IMMODULES_ABSDIR/"; \
- gtk-query-immodules-3.0 | \
-   sed "s|^\".*/immodules/|\"/Applications/${APP_NAME}/Contents/Resources/lib/gtk-3.0/3.0.0/immodules/|" > immodules.cache)
+# the paths are absolute and need to be adjustes to APP_NAME
+(
+	cd "$IMMODULES_ABSDIR/"
+	gtk-query-immodules-3.0 |
+		sed "s|^\".*/immodules/|\"/Applications/${APP_NAME}/Contents/Resources/lib/gtk-3.0/3.0.0/immodules/|" >immodules.cache
+)
 
-for file in $(find "${BIN_ABSDIR}" -type f)
-do
-  add_dylibs_using_macpack "${file}" ".."
-done
-
-for file in $(find "$PIXBUF_LOADER_ABSDIR" -type f)
-do
-  add_dylibs_using_macpack "${file}" "$PIXBUF_LOADER_RELDIR"
+for file in $(find "${BIN_ABSDIR}" -type f); do
+	add_dylibs_using_macpack "${file}" ".."
 done
 
-for file in $(find "$IMMODULES_ABSDIR" -type f)
-do
-  add_dylibs_using_macpack "${file}" "$IMMODULES_RELDIR"
+for file in $(find "$PIXBUF_LOADER_ABSDIR" -type f); do
+	add_dylibs_using_macpack "${file}" "$PIXBUF_LOADER_RELDIR"
+done
+
+for file in $(find "$IMMODULES_ABSDIR" -type f); do
+	add_dylibs_using_macpack "${file}" "$IMMODULES_RELDIR"
 done
 
 # Dynamic library debug output
 
-if [ "$OTOOLDUMP" == 'Y' ]
-then
-  > logs/otool.log
-  for file in $BIN_ABSDIR/* $DYNLIB_ABSDIR/* $PIXBUF_LOADER_ABSDIR/* $IMMODULES_ABSDIR/*
-  do
-    otool -L $file >> logs/otool.log
-  done
+if [ "$OTOOLDUMP" == 'Y' ]; then
+	>logs/otool.log
+	for file in $BIN_ABSDIR/* $DYNLIB_ABSDIR/* $PIXBUF_LOADER_ABSDIR/* $IMMODULES_ABSDIR/*; do
+		otool -L $file >>logs/otool.log
+	done
 fi
 
 ##### Add files from additional macports packages #####
 
 ### Adwaita icon theme
 
-add_files_of_package "adwaita-icon-theme"  \
-"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
-"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
-"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
-"mimetypes/text\|mimetypes/inode\|mimetypes/application\|"\
-"places/folder\|places/user\|status/dialog\|ui/pan\|"\
-"legacy/document\|legacy/go\|legacy/process\|legacy/window\|legacy/system\)"
+add_files_of_package "adwaita-icon-theme" \
+	"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
+	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
+	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
+	"mimetypes/text\|mimetypes/inode\|mimetypes/application\|"\
+	"places/folder\|places/user\|status/dialog\|ui/pan\|"\
+	"legacy/document\|legacy/go\|legacy/process\|legacy/window\|legacy/system\)"
 
 make_theme_index "${RSRC_ABSDIR}/share/icons/Adwaita/"
-
 
 ### GTK compiled schemas
 
@@ -542,20 +539,18 @@ add_folder_recursively "${PKG_MANAGER_ROOT}" "share/gtksourceview-3.0"
 
 # Find CoqIDE folder
 
-if [ -d coq/ide/coqide ]
-then 
-  coqidefolder=coq/ide/coqide
-elif [ -d coq/ide  ]
-then
-  coqidefolder=coq/ide
+if [ -d coq/ide/coqide ]; then
+	coqidefolder=coq/ide/coqide
+elif [ -d coq/ide ]; then
+	coqidefolder=coq/ide
 else
-  echo "ERROR: cannot find CoqIDE folder"
+	echo "ERROR: cannot find CoqIDE folder"
 fi
 
 # Create Info.plist file
 
 sed -e "s/VERSION/${COQ_VERSION_MACOS}/g" ../macos/Info.plist.template > \
-    ${APP_ABSDIR}/Contents/Info.plist
+	${APP_ABSDIR}/Contents/Info.plist
 
 # Rename coqide to coqide.exe
 
@@ -582,12 +577,11 @@ ln -sf /Applications _dmg/Applications
 
 ##### Create README.html #####
 
-if [ "${CREATEREADME}" == "Y" ]
-then
+if [ "${CREATEREADME}" == "Y" ]; then
 
-echo '##### Create README.html #####'
+	echo '##### Create README.html #####'
 
-cat > _dmg/README.html <<EOT
+	cat >_dmg/README.html <<EOT
 <html>
 <head>
 <title>The Coq Platform - $COQ_PLATFORM_RELEASE</title>
@@ -626,10 +620,9 @@ dd {
 </p>
 EOT
 
-if list_contains_prefix "$PRIMARY_PACKAGES" 'coq-compcert'
-then
-echo "Added license note for CompCert"
-cat >> _dmg/README.html <<EOT
+	if list_contains_prefix "$PRIMARY_PACKAGES" 'coq-compcert'; then
+		echo "Added license note for CompCert"
+		cat >>_dmg/README.html <<EOT
 <p>
   Please note that this release of the Coq Platform contains software with
   <b>non-free licenses which do not allow commercial use</b>, notably the
@@ -637,9 +630,9 @@ cat >> _dmg/README.html <<EOT
   below and verify that they are compatible with your intended use.
 </p>
 EOT
-fi
+	fi
 
-cat >> _dmg/README.html <<EOT
+	cat >>_dmg/README.html <<EOT
 <h2>Coq Platform $COQ_PLATFORM_RELEASE packages</h2>
 <p>
   The Coq Platform version $COQ_PLATFORM_RELEASE
@@ -648,99 +641,93 @@ cat >> _dmg/README.html <<EOT
 <dl>
 EOT
 
-# Create an readme entry for an opam package
-# $1 = opam package name
-# $2 = true for primary, false for secondary packages
+	# Create an readme entry for an opam package
+	# $1 = opam package name
+	# $2 = true for primary, false for secondary packages
 
-function html_package_opam {
-  echo "Create README for $1"
+	function html_package_opam {
+		echo "Create README for $1"
 
-  # Get package informatop from opam
-  # Example output (with 2 license fields ...)
-  # opam show "conf-adwaita-icon-theme" -f version:,license:,synopsis:,homepage:
-  # version:  "1"
-  # license:  "LGPL-3.0-only" "CC-BY-SA-3.0"
-  # synopsis: "Virtual package relying on adwaita-icon-theme"
-  # homepage: "https://github.com/GNOME/adwaita-icon-theme"
-  # Note: the process substition (rather than pipe) avoids a subshell, so that variables can be set.
-  # Note: the declare -a var="(list)" makes it possible to convert a list of quoted strings to an array
-  unset pversion plicense psynopsis phomepage
-  while read var value
-  do
-    case "${var}" in
-      version:)  pversion="${value//\"}" ;;
-      license:)  declare -a plicense="(${value})" ;;
-      synopsis:) psynopsis="${value//\"}" ;;
-      homepage:) phomepage="${value//\"}" ;;
-      *) echo "Unexpected result from opam show: $var $value"; exit 1 ;;
-    esac
-  done < <(opam show "$1" -f version:,license:,synopsis:,homepage:)
-  
-  # Remove conf- prefix for printing of package name
-  package_pretty=${package/conf-}
+		# Get package informatop from opam
+		# Example output (with 2 license fields ...)
+		# opam show "conf-adwaita-icon-theme" -f version:,license:,synopsis:,homepage:
+		# version:  "1"
+		# license:  "LGPL-3.0-only" "CC-BY-SA-3.0"
+		# synopsis: "Virtual package relying on adwaita-icon-theme"
+		# homepage: "https://github.com/GNOME/adwaita-icon-theme"
+		# Note: the process substition (rather than pipe) avoids a subshell, so that variables can be set.
+		# Note: the declare -a var="(list)" makes it possible to convert a list of quoted strings to an array
+		unset pversion plicense psynopsis phomepage
+		while read var value; do
+			case "${var}" in
+			version:) pversion="${value//\"/}" ;;
+			license:) declare -a plicense="(${value})" ;;
+			synopsis:) psynopsis="${value//\"/}" ;;
+			homepage:) phomepage="${value//\"/}" ;;
+			*)
+				echo "Unexpected result from opam show: $var $value"
+				exit 1
+				;;
+			esac
+		done < <(opam show "$1" -f version:,license:,synopsis:,homepage:)
 
-  # Do basic HTML escaping for synposis
-  # I used 'recode' for this, but it is rather fragile, and this should be good enough
-  psynopsis="${psynopsis//&/&amp;}"
-  psynopsis="${psynopsis//</&lt;}"
-  psynopsis="${psynopsis//>/&gt;}"
-  psynopsis="${psynopsis//\"/&quot;}"
-  psynopsis="${psynopsis//\'/&apos;}"
+		# Remove conf- prefix for printing of package name
+		package_pretty=${package/conf-/}
 
-  # Elaborate license information
-  if [ ${#plicense[@]} -eq 0 ]
-  then
-    echo "License for package '${package}' is unspecified" >> WARNINGS.log
-    licensehtml="unknown - please clarify with <a href=\"${phomepage}\" target=\"_blank\">homepage</a>"
-  else
-    licensehtml=""
-    for license in "${plicense[@]}"
-    do
-      license="${license//\"}"
-      license=${license/CeCILL/CECILL}
-      if [[ "${license}" == 'https://'* ]] || [[ "${license}" == 'http://'* ]]
-      then
-        licensehtml="${licensehtml} <a href=\"${license}\" target=\"_blank\">link</a>"
-      elif check_spdx_license "${license}" "${package}"
-      then
-        licensehtml="${licensehtml} <a href=\"https://spdx.org/licenses/${license}.html\" target=\"_blank\">${license}</a>"
-      else
-        licensehtml="${licensehtml} ${license} - see <a href=\"${phomepage}\" target=\"_blank\">homepage</a> for details"
-      fi
-    done
-  fi
+		# Do basic HTML escaping for synopsis
+		# I used 'recode' for this, but it is rather fragile, and this should be good enough
+		psynopsis="${psynopsis//&/&amp;}"
+		psynopsis="${psynopsis//</&lt;}"
+		psynopsis="${psynopsis//>/&gt;}"
+		psynopsis="${psynopsis//\"/&quot;}"
+		psynopsis="${psynopsis//\'/&apos;}"
 
-  # Look up the opam package
-  if [[ "$1" == "coq-"* ]]
-  then
-    popam_url="https://github.com/coq/opam-coq-archive/tree/master/released/packages/${package}/${package}.${pversion}/opam"
-  else
-    popam_url="https://github.com/ocaml/opam-repository/tree/master/packages/${package}/${package}.${pversion}/opam"
-  fi
-  if [ "${CHECKOPAMLINKS}" == 'Y' ] && ! check_url "${popam_url}"
-  then
-    echo "opam url '${popam_url}' for package '${package}' does not exist!" >> WARNINGS.log
-  fi
+		# Elaborate license information
+		if [ ${#plicense[@]} -eq 0 ]; then
+			echo "License for package '${package}' is unspecified" >>WARNINGS.log
+			licensehtml="unknown - please clarify with <a href=\"${phomepage}\" target=\"_blank\">homepage</a>"
+		else
+			licensehtml=""
+			for license in "${plicense[@]}"; do
+				license="${license//\"/}"
+				license=${license/CeCILL/CECILL}
+				if [[ "${license}" == 'https://'* ]] || [[ "${license}" == 'http://'* ]]; then
+					licensehtml="${licensehtml} <a href=\"${license}\" target=\"_blank\">link</a>"
+				elif check_spdx_license "${license}" "${package}"; then
+					licensehtml="${licensehtml} <a href=\"https://spdx.org/licenses/${license}.html\" target=\"_blank\">${license}</a>"
+				else
+					licensehtml="${licensehtml} ${license} - see <a href=\"${phomepage}\" target=\"_blank\">homepage</a> for details"
+				fi
+			done
+		fi
 
-  # Create final HTML text for package
-  if $2
-  then
-    printf "<dt><a href='%s'>%s</a> (%s)</dt><dd>%s (license: %s, package: <a href='%s'>opam</a>)</dd>\n" \
-      "${phomepage}" "${package_pretty}" "${pversion}" "${psynopsis}" "${licensehtml}" "${popam_url}" \
-      >> _dmg/README.html
-  else
-    printf "<p><a href='%s'>%s</a> (opam-version: %s, license: %s, package: <a href='%s'>opam</a>)</p>\n" \
-      "${phomepage}" "${package_pretty}" "${pversion}" "${licensehtml}" "${popam_url}" \
-      >> _dmg/README.html
-  fi
-}
+		# Look up the opam package
+		if [[ "$1" == "coq-"* ]]; then
+			popam_url="https://github.com/coq/opam-coq-archive/tree/master/released/packages/${package}/${package}.${pversion}/opam"
+		else
+			popam_url="https://github.com/ocaml/opam-repository/tree/master/packages/${package}/${package}.${pversion}/opam"
+		fi
+		if [ "${CHECKOPAMLINKS}" == 'Y' ] && ! check_url "${popam_url}"; then
+			echo "opam url '${popam_url}' for package '${package}' does not exist!" >>WARNINGS.log
+		fi
 
-for package in $(echo ${PRIMARY_PACKAGES} | tr -s ' ' '\n' | sort)
-do
-  html_package_opam "${package}" true
-done
+		# Create final HTML text for package
+		if $2; then
+			printf "<dt><a href='%s'>%s</a> (%s)</dt><dd>%s (license: %s, package: <a href='%s'>opam</a>)</dd>\n" \
+				"${phomepage}" "${package_pretty}" "${pversion}" "${psynopsis}" "${licensehtml}" "${popam_url}" \
+				>>_dmg/README.html
+		else
+			printf "<p><a href='%s'>%s</a> (opam-version: %s, license: %s, package: <a href='%s'>opam</a>)</p>\n" \
+				"${phomepage}" "${package_pretty}" "${pversion}" "${licensehtml}" "${popam_url}" \
+				>>_dmg/README.html
+		fi
+	}
 
-cat >> _dmg/README.html <<EOT
+	for package in $(echo ${PRIMARY_PACKAGES} | tr -s ' ' '\n' | sort); do
+		html_package_opam "${package}" true
+	done
+
+	cat >>_dmg/README.html <<EOT
 </dl>
 <h2>Dependecy packages</h2>
 <p>
@@ -753,17 +740,15 @@ cat >> _dmg/README.html <<EOT
 <dl>
 EOT
 
-# sort packages by name, but ignore a "conf-" prefix
-for package in $(echo $PACKAGES_DONE | tr -s ' ' '\n' | sed -E 's/(.*)/\1 \1/' | sed 's/^conf-//' | sort | cut -d ' ' -f2)
-do
-  # Note: we do not ignore "IGNORED_PACKAGES" here, because they might still be linked in
-  if ! list_contains "${PRIMARY_PACKAGES}" "${package}"
-  then
-    html_package_opam "${package}" false
-  fi
-done
+	# sort packages by name, but ignore a "conf-" prefix
+	for package in $(echo $PACKAGES_DONE | tr -s ' ' '\n' | sed -E 's/(.*)/\1 \1/' | sed 's/^conf-//' | sort | cut -d ' ' -f2); do
+		# Note: we do not ignore "IGNORED_PACKAGES" here, because they might still be linked in
+		if ! list_contains "${PRIMARY_PACKAGES}" "${package}"; then
+			html_package_opam "${package}" false
+		fi
+	done
 
-cat >> _dmg/README.html <<'EOT'
+	cat >>_dmg/README.html <<'EOT'
 </dl>
 </body>
 </html>
@@ -775,35 +760,34 @@ fi
 
 ##### Sign application #####
 
-if [ "${SIGN}" == "Y" ]
-then
-  echo '##### Sign application #####'
+if [ "${SIGN}" == "Y" ]; then
+	echo '##### Sign application #####'
 
-  echo "### Create temporary keychain ###"
-  read  -n 1 -p "Please have the certificate password ready! - as soon as the dialog box opens, the system is locked!" waitinput
-  KEYCHAIN=coq-macos-sign.keychain
-  security create-keychain -p temporary_pw "${KEYCHAIN}"
-  security unlock-keychain -p temporary_pw "${KEYCHAIN}"
-  security set-keychain-settings -t 3600 -u "${KEYCHAIN}"
-  security import "${SIGN_CERT}.cer" -k ~/Library/Keychains/"${KEYCHAIN}" -T /usr/bin/codesign
-  security import "${SIGN_CERT}.p12" -k ~/Library/Keychains/"${KEYCHAIN}" -T /usr/bin/codesign
-  security set-key-partition-list -S apple-tool:,apple: -s -k temporary_pw ~/Library/Keychains/"${KEYCHAIN}"
+	echo "### Create temporary keychain ###"
+	read -n 1 -p "Please have the certificate password ready! - as soon as the dialog box opens, the system is locked!" waitinput
+	KEYCHAIN=coq-macos-sign.keychain
+	security create-keychain -p temporary_pw "${KEYCHAIN}"
+	security unlock-keychain -p temporary_pw "${KEYCHAIN}"
+	security set-keychain-settings -t 3600 -u "${KEYCHAIN}"
+	security import "${SIGN_CERT}.cer" -k ~/Library/Keychains/"${KEYCHAIN}" -T /usr/bin/codesign
+	security import "${SIGN_CERT}.p12" -k ~/Library/Keychains/"${KEYCHAIN}" -T /usr/bin/codesign
+	security set-key-partition-list -S apple-tool:,apple: -s -k temporary_pw ~/Library/Keychains/"${KEYCHAIN}"
 
-  echo "### Add temporary keychain to active keychains ###"
-  ACTIVE_KEYCHAINS="$(security list-keychains -d user | sed -e s/\"//g)"
-  echo ${ACTIVE_KEYCHAINS}
-  security list-keychains -d user -s ${ACTIVE_KEYCHAINS} ~/Library/Keychains/"${KEYCHAIN}"
-  security list-keychains
+	echo "### Add temporary keychain to active keychains ###"
+	ACTIVE_KEYCHAINS="$(security list-keychains -d user | sed -e s/\"//g)"
+	echo ${ACTIVE_KEYCHAINS}
+	security list-keychains -d user -s ${ACTIVE_KEYCHAINS} ~/Library/Keychains/"${KEYCHAIN}"
+	security list-keychains
 
-  echo "### Codesign ###"
-  codesign -f -v --keychain ~/Library/Keychains/"${KEYCHAIN}" -s "${SIGN_ID}" "_dmg/${APP_NAME}"
+	echo "### Codesign ###"
+	codesign -f -v --keychain ~/Library/Keychains/"${KEYCHAIN}" -s "${SIGN_ID}" "_dmg/${APP_NAME}"
 
-  echo "### Remove temporary keychain from active keychains ###"
-  security list-keychains -d user -s ${ACTIVE_KEYCHAINS}
-  security list-keychains
+	echo "### Remove temporary keychain from active keychains ###"
+	security list-keychains -d user -s ${ACTIVE_KEYCHAINS}
+	security list-keychains
 
-  echo "### Delete temporary keychain ###"
-  security delete-keychain "${KEYCHAIN}"
+	echo "### Delete temporary keychain ###"
+	security delete-keychain "${KEYCHAIN}"
 fi
 
 ##### Create DMG image from folder #####
@@ -811,31 +795,29 @@ fi
 echo '##### Create DMG image #####'
 
 hdi_opts=(-volname "${DMG_NAME}"
-          -srcfolder _dmg
-          -ov # overwrite existing file
-          ${ZIPCOMPR}
-          # needed for backward compat since macOS 10.14 which uses APFS by default
-          # see discussion in #11803
-          -fs hfs+
-         )
+	-srcfolder _dmg
+	-ov # overwrite existing file
+	${ZIPCOMPR}
+	# needed for backward compat since macOS 10.14 which uses APFS by default
+	# see discussion in #11803
+	-fs hfs+
+)
 hdiutil create "${hdi_opts[@]}" "${DMG_NAME}.dmg"
 
 echo "##### Finished installer '${DMG_NAME}.dmg' #####"
 
 ##### Show warnings #####
 
-if [ -f WARNINGS.log ]
-then
-  echo "##### WARNINGS for '${DMG_NAME}.dmg' #####"
-  cat WARNINGS.log
-  echo "##### END OF WARNINGS for '${DMG_NAME}.dmg' #####"
+if [ -f WARNINGS.log ]; then
+	echo "##### WARNINGS for '${DMG_NAME}.dmg' #####"
+	cat WARNINGS.log
+	echo "##### END OF WARNINGS for '${DMG_NAME}.dmg' #####"
 fi
 
 ##### Simply copy the folder over to the Applications folder #####
 
-if [ "${INSTALL}" == 'Y' ]
-then
-  echo '##### Copying to /Applications folder #####'
-  rm -rf "/Applications/${APP_NAME}"
-  cp -R "${APP_ABSDIR}" '/Applications/'
+if [ "${INSTALL}" == 'Y' ]; then
+	echo '##### Copying to /Applications folder #####'
+	rm -rf "/Applications/${APP_NAME}"
+	cp -R "${APP_ABSDIR}" '/Applications/'
 fi

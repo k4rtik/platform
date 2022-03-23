@@ -8,7 +8,7 @@ The first method is recommended for beginners and the second one is recommended 
 
 This method is intended for beginners.
 
-- Download the installer from https://github.com/coq/platform/releases (click on "Assets" at the end of a release section)
+- Download the installer from <https://github.com/coq/platform/releases> (click on "Assets" at the end of a release section)
 - Run the installer and follow the instructions
 
 A note to lecturers: it is easy to create a customized Windows installer from an opam switch - see [Customized Installers](#customized-installers)

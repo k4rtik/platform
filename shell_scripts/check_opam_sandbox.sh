@@ -10,12 +10,10 @@
 
 ###################### SANITY OPAM SANDBOX SCRIPT #####################
 
-if [[ "$OSTYPE" == darwin* ]]
-then
+if [[ "$OSTYPE" == darwin* ]]; then
 
 	# Check if opam sandbox script is current
-	if !  grep "allow network" "$(opam var root)/opam-init/hooks/sandbox.sh"
-	then
+	if ! grep "allow network" "$(opam var root)/opam-init/hooks/sandbox.sh"; then
 		cat <<-"EOH"
 			======================== Outdated opam sandbox script ========================
 			opam has a sandbox mechanism to ensure that build scripts do not modify
@@ -24,14 +22,13 @@ then
 			is that some time in the past you updated opam without a call to:
 
 			  opam init --reinit --no-setup
-			
+
 			This opam call updates your .opam folder to the current version of opam.
 			Shall this script now run "opam init --reinit --no-setup" to fix this?
 			======================== Outdated opam sandbox script ========================
-			EOH
+		EOH
 		ask_user_opt1_cancel "Enter (y) to run 'opam init --reinit --no-setup' now or (c) to cancel" yY yes
-		if [ "$ANSWER" == "y" ]
-		then
+		if [ "$ANSWER" == "y" ]; then
 			opam init --reinit --no-setup
 		fi
 	fi

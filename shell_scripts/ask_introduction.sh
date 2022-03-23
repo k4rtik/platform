@@ -12,9 +12,8 @@
 
 # introduction / extent
 
-if [ -z "${COQ_PLATFORM_EXTENT:+x}" ]
-then
-cat <<EOH
+if [ -z "${COQ_PLATFORM_EXTENT:+x}" ]; then
+	cat <<EOH
 ====================== JUST COQ OR COMPLETE PLATFORM ? =======================
 This script installs the Coq Platform release $COQ_PLATFORM_RELEASE, that is:
 
@@ -37,6 +36,6 @@ just Coq (+ CoqIDE) and install additional packages via opam later as needed.
 You should install CoqIDE unless you know what VSCoq or Proof General is.
 ====================== JUST COQ OR COMPLETE PLATFORM ? =======================
 EOH
-  ask_user_opt4_cancel "Install full (f), extended (x), base (b) or IDE (i)?" fF "full platform" xX "extended platform" bB "base Coq" iI "Coq+CoqIDE"
-  COQ_PLATFORM_EXTENT=$ANSWER
+	ask_user_opt4_cancel "Install full (f), extended (x), base (b) or IDE (i)?" fF "full platform" xX "extended platform" bB "base Coq" iI "Coq+CoqIDE"
+	COQ_PLATFORM_EXTENT=$ANSWER
 fi

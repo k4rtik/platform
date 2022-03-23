@@ -20,23 +20,23 @@ mkdir -p "$DIR_TARGET"
 
 # The NSIS include file for the visible installer sections
 FILE_SEC_VISIBLE="$DIR_TARGET"/sections_visible.nsh
-> "$FILE_SEC_VISIBLE"
+>"$FILE_SEC_VISIBLE"
 
 # The NSIS include file for the hidden installer sections
 FILE_SEC_HIDDEN="$DIR_TARGET"/sections_hidden.nsh
-> "$FILE_SEC_HIDDEN"
+>"$FILE_SEC_HIDDEN"
 
 # The NSIS include file for dependencies between user visible packages
 FILE_DEP_VISIBLE="$DIR_TARGET"/dependencies_visible.nsh
-> "$FILE_DEP_VISIBLE"
+>"$FILE_DEP_VISIBLE"
 
 # The NSIS include file for dependencies between hidden packages
 FILE_DEP_HIDDEN="$DIR_TARGET"/dependencies_hidden.nsh
-> "$FILE_DEP_HIDDEN"
+>"$FILE_DEP_HIDDEN"
 
 # a NSIS include file, which resets all hidden dependency selections
 FILE_RES_HIDDEN="$DIR_TARGET"/reset_hidden.nsh
-> $FILE_RES_HIDDEN
+>$FILE_RES_HIDDEN
 
 # a NSIS include file which selects dependents of visible sections
 FILE_VISIBLE_SEL="$DIR_TARGET"/dependencies_visible_selection.nsh
@@ -46,11 +46,11 @@ FILE_VISIBLE_DESEL="$DIR_TARGET"/dependencies_visible_deselection.nsh
 
 # The NSIS include file for strings, e.g. section descriptions
 FILE_STRINGS="$DIR_TARGET"/strings.nsh
-> "$FILE_STRINGS"
+>"$FILE_STRINGS"
 
 # The NSIS include file for section descriptions
 FILE_SEC_DESCRIPTIONS="$DIR_TARGET"/section_descriptions.nsh
-> "$FILE_SEC_DESCRIPTIONS"
+>"$FILE_SEC_DESCRIPTIONS"
 
 ##### Utility functions #####
 
@@ -59,9 +59,9 @@ FILE_SEC_DESCRIPTIONS="$DIR_TARGET"/section_descriptions.nsh
 # $2 = item
 
 function list_contains {
-#   This variant does not work when $2 contains regexp chars like conf-g++
-#   [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]]
-    [[ $'\n'"$1"$'\n' == *$'\n'"$2"$'\n'* ]]
+	#   This variant does not work when $2 contains regexp chars like conf-g++
+	#   [[ $1 =~ (^|[[:space:]])$2($|[[:space:]]) ]]
+	[[ $'\n'"$1"$'\n' == *$'\n'"$2"$'\n'* ]]
 }
 
 # Add dlls for an executable using ldd to find them
@@ -70,15 +70,14 @@ function list_contains {
 # $3 = file list file name
 
 function add_dlls_using_ldd {
-  if [ -f "$DIR_TARGET/$3.nsh" ]
-  then
-    echo "Adding DLLs for $1"
-    echo 'SetOutPath $INSTDIR\bin' >> "$DIR_TARGET/$3.nsh"
-    for file in $(ldd $(which "$1") | cut -d ' ' -f 3 | grep "$2" | sort -u)
-    do
-      echo -n "FILE "; cygpath -aw "$file";
-    done >> "$DIR_TARGET/$3.nsh"
-  fi
+	if [ -f "$DIR_TARGET/$3.nsh" ]; then
+		echo "Adding DLLs for $1"
+		echo 'SetOutPath $INSTDIR\bin' >>"$DIR_TARGET/$3.nsh"
+		for file in $(ldd $(which "$1") | cut -d ' ' -f 3 | grep "$2" | sort -u); do
+			echo -n "FILE "
+			cygpath -aw "$file"
+		done >>"$DIR_TARGET/$3.nsh"
+	fi
 }
 
 # Add files from a cygwin package using package name and grp filter
@@ -94,22 +93,20 @@ function add_dlls_using_ldd {
 # package could have several prefixes
 
 function add_files_using_cygwin_package {
-  if [ -f "$DIR_TARGET/$3.nsh" ]
-  then
-    echo "Adding files from cygwin package $1"
-    prevpath="--none--"
-    for file in $(cygcheck -l "$1" | grep "$2" | sort -u)
-    do
-      relpath="${file#/usr/${COQ_ARCH}-w64-mingw32/sys-root/mingw/}"
-      relpath="${relpath%/*}"
-      if [ "$relpath" != "$prevpath" ]
-      then
-        echo 'SetOutPath $INSTDIR\'"$(cygpath -w "$relpath")"
-        prevpath="$relpath"
-      fi
-      echo -n "FILE "; cygpath -aw "$file";
-    done >> "$DIR_TARGET/$3.nsh"
-  fi
+	if [ -f "$DIR_TARGET/$3.nsh" ]; then
+		echo "Adding files from cygwin package $1"
+		prevpath="--none--"
+		for file in $(cygcheck -l "$1" | grep "$2" | sort -u); do
+			relpath="${file#/usr/${COQ_ARCH}-w64-mingw32/sys-root/mingw/}"
+			relpath="${relpath%/*}"
+			if [ "$relpath" != "$prevpath" ]; then
+				echo 'SetOutPath $INSTDIR\'"$(cygpath -w "$relpath")"
+				prevpath="$relpath"
+			fi
+			echo -n "FILE "
+			cygpath -aw "$file"
+		done >>"$DIR_TARGET/$3.nsh"
+	fi
 }
 
 # Add a folder recursively
@@ -118,22 +115,20 @@ function add_files_using_cygwin_package {
 # $3 file list file name
 
 function add_foler_recursively {
-  if [ -f "$DIR_TARGET/$3.nsh" ]
-  then
-    echo "Adding files from folder $1/$2"
-    prevpath="--none--"
-    for file in $(find $1$2 -type f | sort -u)
-    do
-      relpath="${file#$1}"
-      relpath="${relpath%/*}"
-      if [ "$relpath" != "$prevpath" ]
-      then
-        echo 'SetOutPath $INSTDIR\'"$(cygpath -w "$relpath")"
-        prevpath="$relpath"
-      fi
-      echo -n "FILE "; cygpath -aw "$file";
-    done >> "$DIR_TARGET/$3.nsh"
-  fi
+	if [ -f "$DIR_TARGET/$3.nsh" ]; then
+		echo "Adding files from folder $1/$2"
+		prevpath="--none--"
+		for file in $(find $1$2 -type f | sort -u); do
+			relpath="${file#$1}"
+			relpath="${relpath%/*}"
+			if [ "$relpath" != "$prevpath" ]; then
+				echo 'SetOutPath $INSTDIR\'"$(cygpath -w "$relpath")"
+				prevpath="$relpath"
+			fi
+			echo -n "FILE "
+			cygpath -aw "$file"
+		done >>"$DIR_TARGET/$3.nsh"
+	fi
 }
 
 # Add a single file
@@ -142,11 +137,10 @@ function add_foler_recursively {
 # $3 file list file name
 
 function add_single_file {
-  if [ -f "$DIR_TARGET/$3.nsh" ]
-  then
-    echo 'SetOutPath $INSTDIR\'"$(dirname "$(cygpath -w "$2")")" >> "$DIR_TARGET/$3.nsh"
-    echo -n "FILE $(cygpath -aw "$1$2")" >> "$DIR_TARGET/$3.nsh"
-  fi
+	if [ -f "$DIR_TARGET/$3.nsh" ]; then
+		echo 'SetOutPath $INSTDIR\'"$(dirname "$(cygpath -w "$2")")" >>"$DIR_TARGET/$3.nsh"
+		echo -n "FILE $(cygpath -aw "$1$2")" >>"$DIR_TARGET/$3.nsh"
+	fi
 }
 
 ###### Get filtered list of explicitly installed packages #####
@@ -163,9 +157,9 @@ SELECTABLE_PACKAGES="$(opam list --installed-roots --short --columns=name | grep
 declare -A OPAM_FILE_WHITELIST
 declare -A OPAM_FILE_BLACKLIST
 
-OPAM_FILE_WHITELIST[ocaml-variants]='.^' # this has the ocaml compiler in
-OPAM_FILE_WHITELIST[base]='.^' # ocaml stdlib
-OPAM_FILE_WHITELIST[ocaml-compiler-libs]='.^'
+OPAM_FILE_WHITELIST[ocaml - variants]='.^' # this has the ocaml compiler in
+OPAM_FILE_WHITELIST[base]='.^'             # ocaml stdlib
+OPAM_FILE_WHITELIST[ocaml - compiler - libs]='.^'
 
 OPAM_FILE_WHITELIST[dune]='.^'
 OPAM_FILE_WHITELIST[configurator]='.^'
@@ -175,17 +169,17 @@ OPAM_FILE_WHITELIST[ocamlbuild]='.^'
 OPAM_FILE_WHITELIST[result]='.^'
 OPAM_FILE_WHITELIST[cppo]='.^'
 
-OPAM_FILE_WHITELIST[elpi]='.^' # linked in coq-elpi
-OPAM_FILE_WHITELIST[camlp5]='.^' # linked in elpi
-OPAM_FILE_WHITELIST[ppx_drivers]='.^' # linked in elpi
-OPAM_FILE_WHITELIST[ppxlib]='.^' # linked in elpi
-OPAM_FILE_WHITELIST[ppx_deriving]='.^' # linked in elpi
-OPAM_FILE_WHITELIST[ocaml-migrate-parsetree]='.^' # linked in elpi
-OPAM_FILE_WHITELIST[re]='.^' # linked in elpi
+OPAM_FILE_WHITELIST[elpi]='.^'                        # linked in coq-elpi
+OPAM_FILE_WHITELIST[camlp5]='.^'                      # linked in elpi
+OPAM_FILE_WHITELIST[ppx_drivers]='.^'                 # linked in elpi
+OPAM_FILE_WHITELIST[ppxlib]='.^'                      # linked in elpi
+OPAM_FILE_WHITELIST[ppx_deriving]='.^'                # linked in elpi
+OPAM_FILE_WHITELIST[ocaml - migrate - parsetree]='.^' # linked in elpi
+OPAM_FILE_WHITELIST[re]='.^'                          # linked in elpi
 
-OPAM_FILE_WHITELIST[lablgtk3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
-OPAM_FILE_WHITELIST[lablgtk3-sourceview3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
-OPAM_FILE_WHITELIST[cairo2]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[lablgtk3]="stubs.dll$"               # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[lablgtk3 - sourceview3]="stubs.dll$" # we keep only the stublib DLL, the rest is linked in coqide
+OPAM_FILE_WHITELIST[cairo2]="stubs.dll$"                 # we keep only the stublib DLL, the rest is linked in coqide
 
 ###### Function for analyzing one package
 
@@ -196,97 +190,87 @@ OPAM_FILE_WHITELIST[cairo2]="stubs.dll$" # we keep only the stublib DLL, the res
 # $2 = dependency level
 
 function analyze_package {
-  echo "Analyzing package $1 ($2)"
+	echo "Analyzing package $1 ($2)"
 
-  # Create section entry
-  if list_contains "$SELECTABLE_PACKAGES" "$1"
-  then
-    # This is a user visible package which can be explicitly selected or deselected
-    echo "Section \"$1\" Sec_${1//-/_}" >> "$FILE_SEC_VISIBLE"
-    echo 'SetOutPath "$INSTDIR\"' >> "$FILE_SEC_VISIBLE"
-    echo "!include \"files_$1.nsh\"" >> "$FILE_SEC_VISIBLE"
-    echo "SectionEnd" >> "$FILE_SEC_VISIBLE"
+	# Create section entry
+	if list_contains "$SELECTABLE_PACKAGES" "$1"; then
+		# This is a user visible package which can be explicitly selected or deselected
+		echo "Section \"$1\" Sec_${1//-/_}" >>"$FILE_SEC_VISIBLE"
+		echo 'SetOutPath "$INSTDIR\"' >>"$FILE_SEC_VISIBLE"
+		echo "!include \"files_$1.nsh\"" >>"$FILE_SEC_VISIBLE"
+		echo "SectionEnd" >>"$FILE_SEC_VISIBLE"
 
-    descr="$(opam show --field=synopsis "$1")"
-    descr="${descr//\"/\'}"
-    echo 'LangString DESC_'"${1//-/_}"' ${LANG_ENGLISH} "'"$descr"'"' >> "$FILE_STRINGS"
-    echo '!insertmacro MUI_DESCRIPTION_TEXT ${Sec_'"${1//-/_}"'} $(DESC_'"${1//-/_}"')' >> "$FILE_SEC_DESCRIPTIONS"
-  else
-    # This is a hidden section which is selected automatically by dependency
-    echo "Section \"-$1\" Sec_${1//-/_}" >> "$FILE_SEC_HIDDEN"
-    echo 'SetOutPath "$INSTDIR\"' >> "$FILE_SEC_HIDDEN"
-    echo "!include \"files_$1.nsh\"" >> "$FILE_SEC_HIDDEN"
-    echo "SectionEnd" >> "$FILE_SEC_HIDDEN"
-  fi
+		descr="$(opam show --field=synopsis "$1")"
+		descr="${descr//\"/\'}"
+		echo 'LangString DESC_'"${1//-/_}"' ${LANG_ENGLISH} "'"$descr"'"' >>"$FILE_STRINGS"
+		echo '!insertmacro MUI_DESCRIPTION_TEXT ${Sec_'"${1//-/_}"'} $(DESC_'"${1//-/_}"')' >>"$FILE_SEC_DESCRIPTIONS"
+	else
+		# This is a hidden section which is selected automatically by dependency
+		echo "Section \"-$1\" Sec_${1//-/_}" >>"$FILE_SEC_HIDDEN"
+		echo 'SetOutPath "$INSTDIR\"' >>"$FILE_SEC_HIDDEN"
+		echo "!include \"files_$1.nsh\"" >>"$FILE_SEC_HIDDEN"
+		echo "SectionEnd" >>"$FILE_SEC_HIDDEN"
+	fi
 
-  # Create file list include file
+	# Create file list include file
 
-  if [ ${OPAM_FILE_WHITELIST[$1]+_} ]
-  then
-    whitelist="${OPAM_FILE_WHITELIST[$1]}"
-  else
-    whitelist="." # take everything
-  fi
+	if [ ${OPAM_FILE_WHITELIST[$1]+_} ]; then
+		whitelist="${OPAM_FILE_WHITELIST[$1]}"
+	else
+		whitelist="." # take everything
+	fi
 
-  if [ ${OPAM_FILE_BLACKLIST[$1]+_} ]
-  then
-    blacklist="${OPAM_FILE_BLACKLIST[$1]}"
-  else
-    blacklist="(\.byte\.exe|\.cm[aiox]|\.cmxa|\.o|\.a)$" # exclude byte code and library stuff
-  fi
+	if [ ${OPAM_FILE_BLACKLIST[$1]+_} ]; then
+		blacklist="${OPAM_FILE_BLACKLIST[$1]}"
+	else
+		blacklist="(\.byte\.exe|\.cm[aiox]|\.cmxa|\.o|\.a)$" # exclude byte code and library stuff
+	fi
 
-  echo "# File list for $1 matching $whitelist excluding $blacklist" > "$DIR_TARGET"/files_$1.nsh
-  files="$(opam show --list-files $1 | grep -E "$whitelist" | grep -E -v "$blacklist" )" || true
-  reldir_win_prev="--none--"
-  for file in $files
-  do
-    if [ -d "$file" ]
-    then
-      true # ignore directories
-    elif [ -f "$file" ]
-    then
-      relpath="${file#$OPAM_PREFIX}"
-      reldir="${relpath%/*}"
+	echo "# File list for $1 matching $whitelist excluding $blacklist" >"$DIR_TARGET"/files_$1.nsh
+	files="$(opam show --list-files $1 | grep -E "$whitelist" | grep -E -v "$blacklist")" || true
+	reldir_win_prev="--none--"
+	for file in $files; do
+		if [ -d "$file" ]; then
+			true # ignore directories
+		elif [ -f "$file" ]; then
+			relpath="${file#$OPAM_PREFIX}"
+			reldir="${relpath%/*}"
 
-      file_win="${file//\//\\}"
-      reldir_win="${reldir//\//\\}"
+			file_win="${file//\//\\}"
+			reldir_win="${reldir//\//\\}"
 
-      if [ "$reldir_win" != "$reldir_win_prev" ]
-      then
-        echo SetOutPath "\$INSTDIR$reldir_win" >> "$DIR_TARGET"/files_$1.nsh
-      fi
-      echo FILE "$file_win" >> "$DIR_TARGET"/files_$1.nsh
+			if [ "$reldir_win" != "$reldir_win_prev" ]; then
+				echo SetOutPath "\$INSTDIR$reldir_win" >>"$DIR_TARGET"/files_$1.nsh
+			fi
+			echo FILE "$file_win" >>"$DIR_TARGET"/files_$1.nsh
 
-      reldir_win_prev="$reldir_win"
-    else
-      echo "In package '$1' the file '$file' does not exist"
-      exit 1
-    fi
-  done
+			reldir_win_prev="$reldir_win"
+		else
+			echo "In package '$1' the file '$file' does not exist"
+			exit 1
+		fi
+	done
 
-  # handle dependencies
-  # Note: the --installed is required cause of an opam bug.
-  # See https://github.com/ocaml/opam/issues/4461
-  dependencies="$(opam list --required-by=$1 --short --installed)"
-  for dependency in $dependencies
-  do
-    # Check if dependency is visible or hidden and write dependency checker macro call in respective NSIS include file
-    if list_contains "$SELECTABLE_PACKAGES" "$dependency"
-    then
-      # This is a user visible package which can be explicitly selected or deselected
-      echo "${1//-/_}" "${dependency//-/_}" >> "$FILE_DEP_VISIBLE.in"
-    else
-      # This is a hidden dependency package
-      echo "${1//-/_}" "${dependency//-/_}" >> "$FILE_DEP_HIDDEN.in"
-    fi
+	# handle dependencies
+	# Note: the --installed is required cause of an opam bug.
+	# See https://github.com/ocaml/opam/issues/4461
+	dependencies="$(opam list --required-by=$1 --short --installed)"
+	for dependency in $dependencies; do
+		# Check if dependency is visible or hidden and write dependency checker macro call in respective NSIS include file
+		if list_contains "$SELECTABLE_PACKAGES" "$dependency"; then
+			# This is a user visible package which can be explicitly selected or deselected
+			echo "${1//-/_}" "${dependency//-/_}" >>"$FILE_DEP_VISIBLE.in"
+		else
+			# This is a hidden dependency package
+			echo "${1//-/_}" "${dependency//-/_}" >>"$FILE_DEP_HIDDEN.in"
+		fi
 
-    # Check if dependency is already in the list of known packages
-    if ! list_contains "$PACKAGES" "$dependency"
-    then
-      PACKAGES="$PACKAGES"$'\n'"$dependency"
-      analyze_package "$dependency" $(($2 + 1))
-    fi
-  done
+		# Check if dependency is already in the list of known packages
+		if ! list_contains "$PACKAGES" "$dependency"; then
+			PACKAGES="$PACKAGES"$'\n'"$dependency"
+			analyze_package "$dependency" $(($2 + 1))
+		fi
+	done
 }
 
 ###### Function for sorting a dependency list by level #####
@@ -298,9 +282,8 @@ function analyze_package {
 # $4 reset macro output file name
 # $5 sort options (e.g. -r for reverse)
 
-function sort_dependencies
-{
-  cat  "$1" | awk '
+function sort_dependencies {
+	cat "$1" | awk '
     BEGIN{n=0}
     { DepSrc[n]=$1; DepDest[n]=$2; n++; IsSrc[$1]=1; IsDest[$2]=1; }
     END{
@@ -330,7 +313,7 @@ function sort_dependencies
         print DepLvl[i], DepSrc[i], DepDest[i];
       }
     }' | sort $5 -n | awk "
-    { print \"\${$3}\", \"\${Sec_\"\$2\"}\", \"\${Sec_\"\$3\"}\", \"'\"\$2\"'\", \"'\"\$3\"'\"; }" > "$2"
+    { print \"\${$3}\", \"\${Sec_\"\$2\"}\", \"\${Sec_\"\$3\"}\", \"'\"\$2\"'\", \"'\"\$3\"'\"; }" >"$2"
 }
 
 ###### Go through selected packages and recursively analyze dependencies #####
@@ -338,9 +321,8 @@ function sort_dependencies
 # The initial list of packages is the list of top level packages
 PACKAGES="$SELECTABLE_PACKAGES"
 
-for package in $SELECTABLE_PACKAGES
-do
-  analyze_package "$package" 0
+for package in $SELECTABLE_PACKAGES; do
+	analyze_package "$package" 0
 done
 
 ###### Add system DLLs to some packages #####
@@ -353,12 +335,12 @@ add_dlls_using_ldd "gappa" "/usr/${COQ_ARCH}-w64-mingw32/sys-root/" "files_gappa
 
 ### Adwaita icon theme
 
-add_files_using_cygwin_package "mingw64-${COQ_ARCH}-adwaita-icon-theme"  \
-"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
-"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
-"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
-"mimetypes/text\|places/folder\|places/user\|status/dialog\)"  \
-"files_conf-adwaita-icon-theme"
+add_files_using_cygwin_package "mingw64-${COQ_ARCH}-adwaita-icon-theme" \
+	"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
+	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
+	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
+	"mimetypes/text\|places/folder\|places/user\|status/dialog\)" \
+	"files_conf-adwaita-icon-theme"
 
 ### GTK compiled schemas
 
@@ -372,7 +354,7 @@ add_single_file "/usr/${COQ_ARCH}-w64-mingw32/sys-root/mingw/" "share/glib-2.0/s
 # language-specs/language.rng
 # language-specs/language2.rng
 # styles/classic.xml
-# But since teh complete set is compressed not that large, we add the complete set
+# But since the complete set is compressed not that large, we add the complete set
 
 add_foler_recursively "/usr/${COQ_ARCH}-w64-mingw32/sys-root/mingw/" "share/gtksourceview-3.0" "files_dep-gtksourceview3"
 

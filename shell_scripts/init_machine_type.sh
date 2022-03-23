@@ -15,23 +15,23 @@
 # HYPHEN32 and HYPHEN64 are used as extensions to compiler like opam package names
 
 case $(uname -m) in
-    i686)
-      BITSIZE=32
-      HYPHEN32=-32
-      HYPHEN64=
-      ;;
-    x86_64)
-      BITSIZE=64
-      HYPHEN32=
-      HYPHEN64=-64
-      ;;
-    arm64)
-      BITSIZE=64
-      HYPHEN32=
-      HYPHEN64=-64
-      ;;
-    *)
-      echo "Cannot interpret result of 'uname -m' ($(uname -m))"
-      exit 1
-      ;;
+i686)
+	BITSIZE=32
+	HYPHEN32=-32
+	HYPHEN64=
+	;;
+x86_64)
+	BITSIZE=64
+	HYPHEN32=
+	HYPHEN64=-64
+	;;
+arm64)
+	BITSIZE=64
+	HYPHEN32=
+	HYPHEN64=-64
+	;;
+*)
+	echo "Cannot interpret result of 'uname -m' ($(uname -m))"
+	exit 1
+	;;
 esac

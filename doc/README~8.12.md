@@ -11,7 +11,7 @@ The Coq Platform supports to install several versions of Coq (also in parallel).
 This README file is for **Coq Platform 2022.03.0 with Coq 8.12.2**.
 The README files for other versions are linked in the main [README](../README.md).
 
-This version of Coq Platform 2022.01.0 includes Coq 8.12.2 from 12/2020. The package pick is the original package pick of Coq Platform for Coq 8.12.2. 
+This version of Coq Platform 2022.01.0 includes Coq 8.12.2 from 12/2020. The package pick is the original package pick of Coq Platform for Coq 8.12.2.
 
 The Coq Platform supports four levels of installation extent:
 **base**, **IDE**, **full** and **extended** and a few **optional** packages.
@@ -29,7 +29,7 @@ plan to use these packages.
 The license information given below is obtained from opam.
 The Coq Platform team does no double check this information.
 
-**Note on multiple licenses:** 
+**Note on multiple licenses:**
 In case several licenses are given below, it is not clearly specified what this means.
 It could mean that parts of the software use one license while other parts use another license.
 It could also mean that you can choose between the given licenses.
@@ -338,7 +338,7 @@ The **full level** contains the following packages:
       (<a href='https://github.com/math-comp/finmap/issues'>bug reports</a>)
       (<a href='https://coq.inria.fr/opam/released/packages/coq-mathcomp-finmap/coq-mathcomp-finmap.1.5.0/opam'>opam package</a>)
     </dd>
-    <dt><b>description</b></dt><dd>This library is an extension of mathematical component in order to<br>support finite sets and finite maps on choicetypes (rather that finite<br>types). This includes support for functions with finite support and<br>multisets. The library also contains a generic order and set libary,<br>which will be used to subsume notations for finite sets, eventually.</dd>
+    <dt><b>description</b></dt><dd>This library is an extension of mathematical component in order to<br>support finite sets and finite maps on choicetypes (rather that finite<br>types). This includes support for functions with finite support and<br>multisets. The library also contains a generic order and set library,<br>which will be used to subsume notations for finite sets, eventually.</dd>
   </dl>
 </details>
 

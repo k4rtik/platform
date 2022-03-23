@@ -12,11 +12,9 @@
 
 # VST yes / no
 
-if [ -z "${COQ_PLATFORM_VST:+x}" ]
-then
-  if  [[ "${COQ_PLATFORM_COMPCERT}"  =~ ^[yY] ]]
-  then
-cat <<EOH
+if [ -z "${COQ_PLATFORM_VST:+x}" ]; then
+	if [[ "${COQ_PLATFORM_COMPCERT}" =~ ^[yY] ]]; then
+		cat <<EOH
 ======================= VERIFIED SOFTWARE TOOLCHAIN VST =======================
 The Coq Platform installs the Verified Software Toolchain VST.
 
@@ -30,9 +28,9 @@ to select no (n) below. You can install VST at any time later with:
   opam install coq-vst
 ======================= VERIFIED SOFTWARE TOOLCHAIN VST =======================
 EOH
-    ask_user_opt2_cancel "Install VST (y) or do not install VST (n)?" yY "install VST" nN "do not install VST"
-    COQ_PLATFORM_VST=$ANSWER
-  else
-    COQ_PLATFORM_VST=n
-  fi
+		ask_user_opt2_cancel "Install VST (y) or do not install VST (n)?" yY "install VST" nN "do not install VST"
+		COQ_PLATFORM_VST=$ANSWER
+	else
+		COQ_PLATFORM_VST=n
+	fi
 fi

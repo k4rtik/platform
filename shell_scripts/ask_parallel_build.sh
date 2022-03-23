@@ -12,9 +12,8 @@
 
 # parallel or sequential build
 
-if [ -z "${COQ_PLATFORM_PARALLEL:+x}" ] || [ -z "${COQ_PLATFORM_JOBS:+x}" ]
-then
-cat <<EOH
+if [ -z "${COQ_PLATFORM_PARALLEL:+x}" ] || [ -z "${COQ_PLATFORM_JOBS:+x}" ]; then
+	cat <<EOH
 =============================== PARALLEL BUILD ===============================
 The Coq Platform opam build has two levels of parallelism:
 
@@ -37,8 +36,8 @@ In case these recommendations don't work for you, please report an issue at:
 https://github.com/coq/platform/issues
 =============================== PARALLEL BUILD ===============================
 EOH
-  ask_user_opt2_cancel "Build opam packages parallel (p) or sequential (s)?" pP "parallel" sS "sequential"
-  COQ_PLATFORM_PARALLEL=$ANSWER
-  ask_user_number "Number of parallel make jobs" 1 16
-  COQ_PLATFORM_JOBS=$ANSWER
+	ask_user_opt2_cancel "Build opam packages parallel (p) or sequential (s)?" pP "parallel" sS "sequential"
+	COQ_PLATFORM_PARALLEL=$ANSWER
+	ask_user_number "Number of parallel make jobs" 1 16
+	COQ_PLATFORM_JOBS=$ANSWER
 fi
