@@ -98,7 +98,7 @@ developments.
 
 The packages in the **full level** are mature, well maintained
 and suitable as basis for your own developments.
-See the Coq Platform [charter](charter.md) for details.
+See the Coq Platform [charter](../charter.md) for details.
 
 The **full level** contains the following packages:
 
@@ -1232,4 +1232,3 @@ Please refer to the linked opam package and/or your system package manager for d
     <dt><b>description</b></dt><dd>Stdio implements simple input/output functionalities for OCaml.<br><br>It re-exports the input/output functions of the OCaml standard<br>libraries using a more consistent API.</dd>
   </dl>
 </details>
-

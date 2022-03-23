@@ -336,9 +336,9 @@ add_dlls_using_ldd "gappa" "/usr/${COQ_ARCH}-w64-mingw32/sys-root/" "files_gappa
 ### Adwaita icon theme
 
 add_files_using_cygwin_package "mingw64-${COQ_ARCH}-adwaita-icon-theme" \
-	"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
-	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
-	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
+	"/\(16x16\|22x22\|32x32\|48x48\)/.*\(" \
+	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|" \
+	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|" \
 	"mimetypes/text\|places/folder\|places/user\|status/dialog\)" \
 	"files_conf-adwaita-icon-theme"
 

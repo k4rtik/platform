@@ -510,11 +510,11 @@ fi
 ### Adwaita icon theme
 
 add_files_of_package "adwaita-icon-theme" \
-	"/\(16x16\|22x22\|32x32\|48x48\)/.*\("\
-	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|"\
-	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|"\
-	"mimetypes/text\|mimetypes/inode\|mimetypes/application\|"\
-	"places/folder\|places/user\|status/dialog\|ui/pan\|"\
+	"/\(16x16\|22x22\|32x32\|48x48\)/.*\(" \
+	"actions/bookmark\|actions/document\|devices/drive\|actions/format-text\|actions/go\|actions/list\|" \
+	"actions/media\|actions/pan\|actions/process\|actions/system\|actions/window\|" \
+	"mimetypes/text\|mimetypes/inode\|mimetypes/application\|" \
+	"places/folder\|places/user\|status/dialog\|ui/pan\|" \
 	"legacy/document\|legacy/go\|legacy/process\|legacy/window\|legacy/system\)"
 
 make_theme_index "${RSRC_ABSDIR}/share/icons/Adwaita/"

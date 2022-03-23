@@ -98,7 +98,7 @@ developments.
 
 The packages in the **full level** are mature, well maintained
 and suitable as basis for your own developments.
-See the Coq Platform [charter](charter.md) for details.
+See the Coq Platform [charter](../charter.md) for details.
 
 The **full level** contains the following packages:
 
@@ -1772,4 +1772,3 @@ Please refer to the linked opam package and/or your system package manager for d
     <dt><b>description</b></dt><dd>The Zarith library implements arithmetic and logical operations overnarbitrary-precision integers. It uses GMP to efficiently implementnarithmetic over big integers. Small integers are represented as Camlnunboxed integers, for speed and space economy.</dd>
   </dl>
 </details>
-
